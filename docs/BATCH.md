@@ -33,7 +33,7 @@ O formato de saída (`ExportSettings.Format`) decide qual serviço codifica o re
 | `Tiff` (genérico) | `ITiffEncoder.EncodeAsync` | Preserva o modo de cor da imagem já ajustada; compressão sem perdas (CCITT G4 se bilevel, LZW caso contrário). |
 | `Png` / `Jpg` | `IImageExporter.SaveAsync` | |
 | `Pdf` | `IPdfService.WritePdfAsync` | Um PDF de página única por item; o modo (Documental/Cinza/Cor) é inferido do formato de pixel da imagem já ajustada, a menos que `ExportSettings.Pdf` informe um explicitamente. |
-| `PdfSearchable` | — | Falha o **lote inteiro** de uma vez, antes de processar qualquer item (mensagem clara: depende do OCR, Fase 9) — mais claro do que descobrir isso item a item. |
+| `PdfSearchable` | `IOcrService.RecognizeAsync` + `IPdfService.WritePdfAsync` | Fase 9: reconhece o texto da imagem já ajustada (idioma/orientação de `ExportSettings.Ocr`, ou `OcrSettings.Default` quando nulo) e gera o PDF com a camada de texto invisível — como qualquer outro passo do pipeline, uma falha aqui (ex.: falha no OCR) marca só aquele item como `Failed`, sem derrubar o lote. |
 
 Uma falha em um item (arquivo corrompido, arquivo ausente, formato incompatível com o modo
 escolhido) nunca derruba o lote inteiro: vira `BatchItem.Status = Failed` com uma mensagem
@@ -72,10 +72,13 @@ a lista dos itens que falharam, cada um com sua mensagem de erro.
 
 ## Testes (`SCANOVA.Batch.Tests`)
 
-Só o projeto de testes referencia `SCANOVA.Imaging`/`SCANOVA.Tiff`/`SCANOVA.Pdf` — serviços reais
-(não mocks), testando o lote de ponta a ponta contra os pipelines já existentes: sucesso em
-múltiplos formatos (TIFF/JPG/PDF, com verificação de contagem de páginas do PDF via
-`IPdfRasterizer`), preservação do nome de arquivo, relatório de progresso, resiliência a um item
-com falha, rejeição imediata de `PdfSearchable`, proteção/permissão de sobrescrita, criação
-automática da pasta de destino, aplicação dos ajustes do lote, e pausa/cancelamento — incluindo
-cancelar **enquanto pausado** (o caso que mais facilmente travaria um laço mal-implementado).
+Só o projeto de testes referencia `SCANOVA.Imaging`/`SCANOVA.Tiff`/`SCANOVA.Pdf`/`SCANOVA.Ocr` —
+serviços reais (não mocks, incluindo o `TesseractOcrService` de verdade), testando o lote de
+ponta a ponta contra os pipelines já existentes: sucesso em múltiplos formatos (TIFF/JPG/PDF, com
+verificação de contagem de páginas do PDF via `IPdfRasterizer`), preservação do nome de arquivo,
+relatório de progresso, resiliência a um item com falha, `PdfSearchable` de ponta a ponta (OCR de
+verdade sobre uma imagem sintética com texto, seguido de re-extração do texto do PDF gerado via
+`TryExtractTextAsync`) incluindo o caso de falha isolada por item (arquivo de origem ausente),
+proteção/permissão de sobrescrita, criação automática da pasta de destino, aplicação dos ajustes
+do lote, e pausa/cancelamento — incluindo cancelar **enquanto pausado** (o caso que mais
+facilmente travaria um laço mal-implementado).

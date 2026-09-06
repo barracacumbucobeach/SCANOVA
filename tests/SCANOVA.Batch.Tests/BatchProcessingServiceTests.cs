@@ -6,10 +6,12 @@ using SCANOVA.Imaging.Detection;
 using SCANOVA.Imaging.Enhancement;
 using SCANOVA.Imaging.ImageLoading;
 using SCANOVA.Imaging.ImageProcessing;
+using SCANOVA.Ocr;
 using SCANOVA.Pdf.PdfRasterizer;
 using SCANOVA.Pdf.PdfWriter;
 using SCANOVA.Tiff.TiffEncoder;
 using SCANOVA.Tiff.TiffValidator;
+using SkiaSharp;
 using CorePixelFormat = SCANOVA.Core.Enums.PixelFormat;
 using Xunit;
 
@@ -25,7 +27,11 @@ public class BatchProcessingServiceTests : IDisposable
     private readonly ITiffEncoder _tiffEncoder = new LibTiffEncoder();
     private readonly ITiffValidator _tiffValidator = new LibTiffValidator();
     private readonly IPdfRasterizer _pdfRasterizer = new PdfToImagePdfRasterizer();
+    private readonly IPdfService _pdfService;
     private readonly IBatchProcessingService _sut;
+
+    private static readonly string OcrLanguageDataFolder = Path.Combine(Path.GetTempPath(), "scanova-ocr-test-langdata");
+    private static readonly string TestFontPath = Path.Combine(AppContext.BaseDirectory, "TestAssets", "NotoSans.ttf");
 
     /// <summary><see cref="IProgress{T}"/> que invoca o handler de forma síncrona (ao contrário de <see cref="Progress{T}"/>, que posta assincronamente) — necessário para testes determinísticos de progresso/pausa.</summary>
     private sealed class SyncProgress<T> : IProgress<T>
@@ -45,9 +51,10 @@ public class BatchProcessingServiceTests : IDisposable
         var detectionService = new DocumentDetectionService(imageService);
         var enhancementService = new DocumentEnhancementService(imageService, detectionService);
         var tiffPipeline = new SCANOVA.Tiff.TiffDocumentPipeline(imageService, _tiffEncoder, _tiffValidator);
-        var pdfService = new PdfSharpPdfService(_tiffEncoder);
+        _pdfService = new PdfSharpPdfService(_tiffEncoder);
+        var ocrService = new TesseractOcrService(_imageExporter, OcrLanguageDataFolder);
 
-        _sut = new BatchProcessingService(_imageLoader, _imageExporter, enhancementService, _tiffEncoder, tiffPipeline, pdfService);
+        _sut = new BatchProcessingService(_imageLoader, _imageExporter, enhancementService, _tiffEncoder, tiffPipeline, _pdfService, ocrService);
     }
 
     public void Dispose()
@@ -80,6 +87,37 @@ public class BatchProcessingServiceTests : IDisposable
         }
 
         var image = new RasterImage(size, size, stride, CorePixelFormat.Rgba32, pixels, 200, 200);
+        var path = Path.Combine(_sourceDir, name);
+        await _imageExporter.SaveAsync(image, path);
+        return path;
+    }
+
+    /// <summary>Cria um PNG sintético de "documento escaneado" com texto real desenhado por código (fonte embutida, nunca um documento de uma pessoa real — seção 122), para o teste de OCR/PDF pesquisável.</summary>
+    private async Task<string> CreateSourceTextPngAsync(string name, string text)
+    {
+        using var typeface = SKTypeface.FromFile(TestFontPath)
+            ?? throw new InvalidOperationException($"Não foi possível carregar a fonte de teste em \"{TestFontPath}\".");
+
+        const int width = 500;
+        const int height = 120;
+        var info = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+        using var surface = SKSurface.Create(info);
+        var canvas = surface.Canvas;
+        canvas.Clear(SKColors.White);
+
+        using var font = new SKFont(typeface, size: 36);
+        using var paint = new SKPaint { Color = SKColors.Black, IsAntialias = true };
+        canvas.DrawText(text, 20, 70, SKTextAlign.Left, font, paint);
+
+        canvas.Flush();
+        using var snapshot = surface.Snapshot();
+        using var bitmap = SKBitmap.FromImage(snapshot);
+
+        var stride = bitmap.RowBytes;
+        var pixels = new byte[stride * bitmap.Height];
+        System.Runtime.InteropServices.Marshal.Copy(bitmap.GetPixels(), pixels, 0, pixels.Length);
+
+        var image = new RasterImage(width, height, stride, CorePixelFormat.Rgba32, pixels, 300, 300);
         var path = Path.Combine(_sourceDir, name);
         await _imageExporter.SaveAsync(image, path);
         return path;
@@ -182,14 +220,35 @@ public class BatchProcessingServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task RunAsync_PdfSearchableFormat_ThrowsImmediatelyWithoutProcessingItems()
+    public async Task RunAsync_PdfSearchableFormat_ProducesSearchablePdfWithRecognizedText()
     {
-        var path = await CreateSourcePngAsync("a.png");
+        // Fase 9: reconhece o texto (Tesseract de verdade) e gera um PDF com camada de texto
+        // invisível — verificado re-extraindo o texto nativo do PDF gerado (PdfPig).
+        var path = await CreateSourceTextPngAsync("recibo.png", "SCANOVA teste");
         var job = CreateJob(new[] { path }, new ExportSettings { Format = OutputFormat.PdfSearchable, DestinationFolder = _destDir });
 
-        await Assert.ThrowsAsync<SCANOVA.Core.Exceptions.PdfProcessingException>(() => _sut.RunAsync(job));
+        var result = await _sut.RunAsync(job);
 
-        Assert.Equal(ProcessingStatus.Pending, job.Items[0].Status);
+        Assert.Equal(ProcessingStatus.Completed, result.Items[0].Status);
+        Assert.True(File.Exists(result.Items[0].OutputPath));
+
+        var extractedText = await _pdfService.TryExtractTextAsync(result.Items[0].OutputPath!, pageIndex: 0);
+        Assert.NotNull(extractedText);
+        Assert.Contains("SCANOVA", extractedText, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task RunAsync_PdfSearchableFormat_FailedOcrMarksOnlyThatItemFailed()
+    {
+        // Reaproveita o mesmo princípio de resiliência por item (seção 63): um arquivo de origem
+        // ausente falha o OCR/PDF pesquisável desse item sem derrubar o lote inteiro.
+        var missingPath = Path.Combine(_sourceDir, "nao-existe.png");
+        var job = CreateJob(new[] { missingPath }, new ExportSettings { Format = OutputFormat.PdfSearchable, DestinationFolder = _destDir });
+
+        var result = await _sut.RunAsync(job);
+
+        Assert.Equal(ProcessingStatus.Failed, result.Items[0].Status);
+        Assert.NotNull(result.Items[0].ErrorMessage);
     }
 
     [Fact]

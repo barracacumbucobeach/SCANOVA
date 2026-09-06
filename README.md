@@ -40,8 +40,9 @@ atual:
       PDFium, MIT/Apache 2.0) — roda de forma idêntica em Windows/Linux/macOS, sem dependência de
       GDI+; extração de texto nativo de um PDF que já contém texto, sem OCR (PdfPig, Apache 2.0);
       conversão TIFF → PDF preservando todas as páginas. "Documento PDF" agora é uma opção real
-      em "Salvar como" no visualizador. A camada de texto invisível de OCR (PDF pesquisável) fica
-      para a Fase 9, quando o motor de OCR fornecer o texto e a posição de cada palavra.
+      em "Salvar como" no visualizador. A camada de texto invisível de OCR (PDF pesquisável) foi
+      implementada na Fase 9, junto do motor de OCR que fornece o texto e a posição de cada
+      palavra.
 - [x] **Fase 7 — Composição frente/verso**: `IDuplexCompositionService` intercala páginas de
       frente e verso escaneadas/abertas em duas passagens separadas (frente 1, verso 1, frente
       2, verso 2, ...), com opções para inverter a ordem do verso (fluxo de duplex manual mais
@@ -53,7 +54,16 @@ atual:
       nunca derruba o lote (relatório final com sucesso/falha por item). Pausa/retomada
       (`SemaphoreSlim`, sem ocupar threads) e cancelamento cooperativo, mesmo enquanto pausado.
       Nova tela "Converter em lote" (Dashboard → "Converter").
-- [ ] Fase 9 — OCR
+- [x] **Fase 9 — OCR**: reconhecimento de texto local (`IOcrService`) com o motor real do
+      Tesseract OCR (invocado como processo externo via linha de comando + saída hOCR, nunca
+      P/Invoke), com modelos de idioma (português/inglês/espanhol) baixados sob demanda e em
+      cache local — nenhuma imagem ou texto sai da máquina. Exportação do texto reconhecido para
+      TXT e DOCX (`DocumentFormat.OpenXml`, MIT). Camada de texto invisível no PDF (PDF
+      pesquisável) usando as posições reais de cada palavra reconhecida, com uma fonte (Noto
+      Sans, SIL OFL 1.1) embutida no aplicativo para funcionar em qualquer plataforma. Nova tela
+      "Extrair texto" (Dashboard → "Extrair texto", ou item de navegação "OCR"): abre um
+      documento, reconhece o texto, permite revisar/corrigir antes de salvar. A conversão em
+      lote (Fase 8) também passa a suportar `PdfSearchable` de ponta a ponta.
 - [ ] Fase 10 — Licenciamento
 - [ ] Fase 11 — Polimento e instalador
 

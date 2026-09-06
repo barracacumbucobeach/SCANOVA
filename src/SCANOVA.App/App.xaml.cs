@@ -7,6 +7,7 @@ using SCANOVA.Core.Interfaces;
 using SCANOVA.Imaging;
 using SCANOVA.Infrastructure;
 using SCANOVA.Infrastructure.FileSystem;
+using SCANOVA.Ocr;
 using SCANOVA.Pdf;
 using SCANOVA.Scanner;
 using SCANOVA.Tiff;
@@ -41,6 +42,7 @@ public partial class App : Application
         services.AddScanovaPdf();
         services.AddScanovaBatch();
         services.AddScanovaScanner();
+        services.AddScanovaOcr(AppPaths.OcrLanguageDataFolder);
 
         services.AddSingleton<INavigationService, FrameNavigationService>();
         services.AddSingleton<INotificationService, NotificationService>();
@@ -51,6 +53,7 @@ public partial class App : Application
         services.AddTransient<ScanViewModel>();
         services.AddTransient<DuplexComposeViewModel>();
         services.AddTransient<BatchConvertViewModel>();
+        services.AddTransient<OcrViewModel>();
 
         return services.BuildServiceProvider();
     }

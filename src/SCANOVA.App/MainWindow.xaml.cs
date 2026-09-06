@@ -114,7 +114,7 @@ public sealed partial class MainWindow : Window
                 navigation.NavigateToPlaceholder("Melhorar", "Use o cartão \"Melhorar documento\" no Início para abrir um documento e melhorá-lo automaticamente (endireitar, corrigir perspectiva, remover fundo/ruído e ajustar tom).");
                 break;
             case "Ocr":
-                navigation.NavigateToPlaceholder("OCR", "O reconhecimento de texto local será implementado na Fase 9 (OCR).");
+                navigation.NavigateTo(typeof(OcrPage));
                 break;
             case "History":
                 navigation.NavigateToPlaceholder("Histórico", "O histórico local (seção 46) será conectado a um armazenamento persistente em uma próxima etapa da Fase 1.");

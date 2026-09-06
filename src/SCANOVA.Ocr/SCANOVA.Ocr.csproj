@@ -6,4 +6,30 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Só depende de SCANOVA.Core: IImageExporter é a única interface usada (para gravar a
+         imagem de entrada em um arquivo temporário antes de invocar o executável do Tesseract) —
+         mesmo padrão de SCANOVA.Pdf/SCANOVA.Batch dependendo só de interfaces do Core. -->
+    <ProjectReference Include="..\SCANOVA.Core\SCANOVA.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Executável nativo do Tesseract OCR (Apache 2.0), empacotado para Windows/Linux/macOS
+         pelo mesmo projeto (NAPS2) já usado na Fase 4 para WIA — mas este pacote é de um
+         repositório separado (cyanfish/naps2-tesseract), com sua própria licença Apache 2.0,
+         distinta da licença GPL-2.0 do aplicativo NAPS2 principal (ver THIRD_PARTY_LICENSES.md).
+         Invocado como processo externo (linha de comando + hOCR), nunca via P/Invoke — evita
+         qualquer dependência de interoperabilidade nativa complexa. -->
+    <PackageReference Include="NAPS2.Tesseract.Binaries" Version="1.4.0" />
+    <!-- Exportação de texto reconhecido para DOCX (seção 111). -->
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Permite testar diretamente os componentes internos (parser de hOCR, provedor de dados
+         de idioma, localizador do executável), sem precisar expô-los publicamente. -->
+    <InternalsVisibleTo Include="SCANOVA.Ocr.Tests" />
+  </ItemGroup>
+
 </Project>

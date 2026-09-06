@@ -33,6 +33,15 @@
     <ProjectReference Include="..\..\src\SCANOVA.Imaging\SCANOVA.Imaging.csproj" />
     <ProjectReference Include="..\..\src\SCANOVA.Tiff\SCANOVA.Tiff.csproj" />
     <ProjectReference Include="..\..\src\SCANOVA.Pdf\SCANOVA.Pdf.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Ocr\SCANOVA.Ocr.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Mesmo arquivo de fonte usado por SCANOVA.Ocr.Tests/SCANOVA.Pdf para desenhar texto de
+         teste (via SkiaSharp, carregada diretamente do arquivo) sem depender de nenhuma fonte
+         instalada no sistema do executor dos testes — necessário para o teste de PdfSearchable
+         de ponta a ponta (OCR de verdade sobre uma imagem sintética). -->
+    <None Include="..\..\src\SCANOVA.Pdf\Assets\NotoSans.ttf" Link="TestAssets\NotoSans.ttf" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

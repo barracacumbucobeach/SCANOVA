@@ -27,13 +27,10 @@ distribuição comercial fechada sem exigir a abertura do código-fonte do SCANO
 | PDFtoImage | 5.4.0 | MIT (verificado em `LICENSE` e no `PackageLicenseExpression` do .csproj do pacote) | Rasterização de páginas PDF existentes em imagem, via PDFium — roda de forma idêntica em Windows/Linux/macOS | https://github.com/sungaila/PDFtoImage |
 | pdfium-binaries (empacotamento do PDFium usado pelo PDFtoImage) | acompanha a versão do PDFtoImage | MIT (scripts de build) sobre o motor PDFium do Chromium, licenciado Apache License 2.0 (verificado em `LICENSE` no repositório `chromium/pdfium`) | Motor de renderização de PDF nativo (PDFium/Chromium) | https://github.com/bblanchon/pdfium-binaries |
 | PdfPig | 0.1.16 | Apache 2.0 (verificado em `LICENSE`; inclui componentes de terceiros sob licença BSD — PDFBox/FontBox) | Extração de texto NATIVO de um PDF que já contém texto real, sem OCR (seção 109) | https://github.com/UglyToad/PdfPig |
-
-## Planejadas para as próximas fases (a confirmar/registrar antes do uso)
-
-| Biblioteca | Licença (a confirmar na fase correspondente) | Finalidade | Fase |
-|---|---|---|---|
-| Tesseract (motor OCR) + wrapper .NET (ex.: charlesw/tesseract, MIT) | Apache 2.0 (Tesseract) / MIT (wrapper) | OCR local, offline, com modelo em português | Fase 9 |
-| DocumentFormat.OpenXml | MIT | Exportação de texto reconhecido para DOCX | Fase 9 |
+| NAPS2.Tesseract.Binaries | 1.4.0 | Apache 2.0 (verificado no `PackageLicenseExpression` do .csproj do pacote e no `LICENSE` do repositório — repositório **separado** do aplicativo NAPS2 principal, ver nota em "Explicitamente evitadas") | Executáveis nativos reais do motor Tesseract OCR (Windows x86/x64/ARM64, Linux x64/ARM64, macOS x64/ARM64), invocados como processo externo (nunca P/Invoke) via linha de comando + saída hOCR (seção 40/107) | https://github.com/cyanfish/naps2-tesseract |
+| tessdata_fast (modelos de idioma do Tesseract) | N/A (dados, baixados sob demanda em tempo de execução, não empacotados) | Apache 2.0 (verificado em `LICENSE` no repositório) | Modelos LSTM "rápidos" oficiais do Tesseract para reconhecimento de texto impresso, em português/inglês/espanhol + orientação (osd) — baixados e armazenados em cache local na primeira vez que um idioma é usado (seção 41) | https://github.com/tesseract-ocr/tessdata_fast |
+| DocumentFormat.OpenXml | 3.5.1 | MIT (verificado em `LICENSE` no repositório) | Exportação do texto reconhecido para DOCX (Word) | https://github.com/dotnet/Open-XML-SDK |
+| Noto Sans (fonte, `NotoSans[wdth,wght].ttf`) | N/A (fonte, arquivo estático embutido como recurso) | SIL Open Font License 1.1 (verificado em `OFL.txt`, incluído junto do arquivo da fonte) | Fonte embutida no assembly `SCANOVA.Pdf` para desenhar a camada de texto invisível/pesquisável do PDF (seção 109-111) — necessária porque o build do PDFsharp usado fora do Windows não tem acesso a nenhuma fonte do sistema por padrão | https://github.com/google/fonts/tree/main/ofl/notosans |
 
 ## Explicitamente evitadas
 
@@ -41,6 +38,14 @@ distribuição comercial fechada sem exigir a abertura do código-fonte do SCANO
   licenciamento comercial pago acima de um determinado faturamento anual do licenciado. Para
   evitar essa obrigação comercial, o processamento de imagem usa **SkiaSharp (MIT)** em seu
   lugar, que cobre o mesmo escopo sem essa restrição.
+- **NAPS2.Sdk / repositório principal `cyanfish/naps2`** — é o wrapper .NET "óbvio" para
+  Tesseract (usado pelo próprio aplicativo NAPS2), mas esse repositório é licenciado **GPL-2.0**,
+  incompatível com o modelo de licenciamento comercial fechado do SCANOVA (seção 146) se
+  referenciado como dependência. Os **binários nativos** do Tesseract usados pelo SCANOVA vêm de
+  um repositório **separado e distinto**, `cyanfish/naps2-tesseract` (Apache 2.0 — linha acima);
+  o wrapper C# que os invoca (`SCANOVA.Ocr.TesseractOcrService`) é código original do SCANOVA,
+  escrito contra a interface de linha de comando pública e genérica do próprio Tesseract, sem
+  copiar nenhum código-fonte do NAPS2.
 
 ## Processo
 

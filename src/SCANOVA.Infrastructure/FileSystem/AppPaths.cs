@@ -23,6 +23,13 @@ public static class AppPaths
 
     public static string LicenseFilePath => Path.Combine(EnsureExists(Path.Combine(RootFolder, "License")), "license.dat");
 
+    /// <summary>
+    /// Pasta onde os modelos de idioma do OCR (.traineddata) ficam guardados após o primeiro
+    /// download (seção 41) — não é um temporário: precisa sobreviver entre execuções para não
+    /// baixar o mesmo modelo de novo a cada vez.
+    /// </summary>
+    public static string OcrLanguageDataFolder => EnsureExists(Path.Combine(RootFolder, "OcrLanguageData"));
+
     private static string EnsureExists(string path)
     {
         Directory.CreateDirectory(path);

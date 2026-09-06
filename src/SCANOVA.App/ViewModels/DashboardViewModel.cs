@@ -111,7 +111,47 @@ public sealed partial class DashboardViewModel : ObservableObject
     [RelayCommand]
     private async Task EnhanceDocumentAsync() => await OpenDocumentAsync();
 
+    /// <summary>
+    /// "Extrair texto" (seção 20/107, Fase 9): abre um documento e vai direto para a tela de OCR
+    /// já com o documento carregado — mesmo fluxo de abertura de <see cref="OpenDocumentAsync"/>.
+    /// </summary>
     [RelayCommand]
-    private void ExtractText() =>
-        _navigation.NavigateToPlaceholder("Extrair texto", "O reconhecimento de texto local (OCR) será implementado na Fase 9.");
+    private async Task ExtractTextAsync()
+    {
+        string? path;
+        try
+        {
+            path = await _filePicker.PickImageFileAsync();
+        }
+        catch (Exception)
+        {
+            _notifications.ShowError("Não foi possível abrir a janela de seleção de arquivo.");
+            return;
+        }
+
+        if (path is null)
+        {
+            return; // usuário cancelou
+        }
+
+        IsOpeningDocument = true;
+        try
+        {
+            var image = await _imageLoader.LoadAsync(path);
+            await DismissWelcomeAsync();
+            _navigation.NavigateTo(typeof(OcrPage), new OcrPageParameter(path, image));
+        }
+        catch (ScanovaException ex)
+        {
+            _notifications.ShowError(ex.UserMessage);
+        }
+        catch (Exception)
+        {
+            _notifications.ShowError("Não foi possível abrir o arquivo selecionado.");
+        }
+        finally
+        {
+            IsOpeningDocument = false;
+        }
+    }
 }

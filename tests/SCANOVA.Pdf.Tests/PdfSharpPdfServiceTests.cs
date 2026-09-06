@@ -107,7 +107,7 @@ public class PdfSharpPdfServiceTests
     }
 
     [Fact]
-    public async Task WritePdfAsync_SearchableModeRequested_ThrowsWithClearMessage()
+    public async Task WritePdfAsync_SearchableModeWithoutOcrResults_ThrowsWithClearMessage()
     {
         var image = TestImages.CreateGray(20, 20);
         var settings = new PdfSettings { Mode = PdfMode.Searchable };
@@ -116,7 +116,45 @@ public class PdfSharpPdfServiceTests
         var ex = await Assert.ThrowsAsync<PdfProcessingException>(() =>
             _sut.WritePdfAsync(new[] { image }, settings, path));
 
-        Assert.Contains("Fase 9", ex.UserMessage);
+        Assert.Contains("OCR", ex.UserMessage);
+    }
+
+    [Fact]
+    public async Task WritePdfAsync_OcrResultsCountMismatch_Throws()
+    {
+        var pages = new[] { TestImages.CreateGray(20, 20), TestImages.CreateGray(20, 20) };
+        var settings = new PdfSettings { Mode = PdfMode.Searchable };
+        var ocrResults = new[] { new OcrResult { Text = "a", Blocks = Array.Empty<OcrBlock>() } }; // só 1, para 2 páginas
+        var path = TempPdfPath();
+
+        await Assert.ThrowsAsync<PdfProcessingException>(() =>
+            _sut.WritePdfAsync(pages, settings, path, ocrResults));
+    }
+
+    [Fact]
+    public async Task WritePdfAsync_SearchableWithOcrResults_TextIsExtractableAtExpectedPosition()
+    {
+        // Página de 200x100 px a 200 DPI = 1,0x0,5 polegada = 72x36 pontos.
+        var image = TestImages.CreateGray(200, 100);
+        var settings = new PdfSettings { Mode = PdfMode.Searchable };
+        var path = TempPdfPath();
+
+        var ocrResult = new OcrResult
+        {
+            Text = "Documento SCANOVA",
+            Blocks = new[]
+            {
+                new OcrBlock { Text = "Documento", BoundingBox = new BoundingBox(10, 10, 80, 20) },
+                new OcrBlock { Text = "SCANOVA", BoundingBox = new BoundingBox(100, 10, 70, 20) },
+            },
+        };
+
+        await _sut.WritePdfAsync(new[] { image }, settings, path, new[] { ocrResult });
+
+        var text = await _sut.TryExtractTextAsync(path, pageIndex: 0);
+        Assert.NotNull(text);
+        Assert.Contains("Documento", text);
+        Assert.Contains("SCANOVA", text);
     }
 
     [Fact]

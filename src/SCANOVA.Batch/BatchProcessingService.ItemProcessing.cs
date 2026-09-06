@@ -98,11 +98,29 @@ public sealed partial class BatchProcessingService
 
             case OutputFormat.Pdf:
                 var pdfSettings = exportSettings.Pdf ?? InferPdfSettings(image);
-                await _pdfService.WritePdfAsync(new[] { image }, pdfSettings, outputPath, ocrTextPerPage: null, cancellationToken).ConfigureAwait(false);
+                await _pdfService.WritePdfAsync(new[] { image }, pdfSettings, outputPath, ocrResults: null, cancellationToken).ConfigureAwait(false);
                 break;
 
+            case OutputFormat.PdfSearchable:
+                {
+                    // Seção 109-111: reconhece o texto do item (localmente — nenhuma imagem sai
+                    // da máquina) e gera um PDF pesquisável com a camada de texto invisível na
+                    // posição de cada palavra. Uma falha aqui vira falha do item, como qualquer
+                    // outro passo do pipeline — nunca derruba o lote inteiro.
+                    var ocrSettings = exportSettings.Ocr ?? OcrSettings.Default;
+                    var ocrResult = await _ocrService.RecognizeAsync(image, ocrSettings, cancellationToken).ConfigureAwait(false);
+
+                    var searchableSettings = new PdfSettings
+                    {
+                        Mode = PdfMode.Searchable,
+                        Dpi = (exportSettings.Pdf ?? InferPdfSettings(image)).Dpi,
+                        IncludeOcrTextLayer = true,
+                    };
+                    await _pdfService.WritePdfAsync(new[] { image }, searchableSettings, outputPath, new[] { ocrResult }, cancellationToken).ConfigureAwait(false);
+                    break;
+                }
+
             default:
-                // PdfSearchable já foi rejeitado em RunAsync antes de chegar aqui.
                 throw new ArgumentOutOfRangeException(nameof(exportSettings), exportSettings.Format, "Formato de exportação não suportado pela conversão em lote.");
         }
     }

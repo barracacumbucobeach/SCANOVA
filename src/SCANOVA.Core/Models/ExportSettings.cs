@@ -20,6 +20,13 @@ public sealed class ExportSettings
     public TiffSettings? Tiff { get; init; }
     public PdfSettings? Pdf { get; init; }
 
+    /// <summary>
+    /// Configuração de OCR usada quando <see cref="Format"/> é
+    /// <see cref="OutputFormat.PdfSearchable"/> (Fase 9). Quando nulo, usa
+    /// <see cref="OcrSettings.Default"/> (português do Brasil, com correção de orientação).
+    /// </summary>
+    public OcrSettings? Ocr { get; init; }
+
     /// <summary>Resolve o nome de arquivo (sem extensão) a ser usado, aplicando o padrão quando necessário.</summary>
     public string ResolveFileName(DateTime timestamp)
     {

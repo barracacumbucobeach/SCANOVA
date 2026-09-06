@@ -1,5 +1,4 @@
 using SCANOVA.Core.Enums;
-using SCANOVA.Core.Exceptions;
 using SCANOVA.Core.Interfaces;
 using SCANOVA.Core.Models;
 
@@ -19,6 +18,7 @@ public sealed partial class BatchProcessingService : IBatchProcessingService
     private readonly ITiffEncoder _tiffEncoder;
     private readonly ITiffDocumentPipeline _tiffPipeline;
     private readonly IPdfService _pdfService;
+    private readonly IOcrService _ocrService;
 
     private readonly System.Collections.Concurrent.ConcurrentDictionary<Guid, PauseGate> _gates = new();
 
@@ -28,7 +28,8 @@ public sealed partial class BatchProcessingService : IBatchProcessingService
         IDocumentEnhancementService enhancementService,
         ITiffEncoder tiffEncoder,
         ITiffDocumentPipeline tiffPipeline,
-        IPdfService pdfService)
+        IPdfService pdfService,
+        IOcrService ocrService)
     {
         _imageLoader = imageLoader;
         _imageExporter = imageExporter;
@@ -36,20 +37,12 @@ public sealed partial class BatchProcessingService : IBatchProcessingService
         _tiffEncoder = tiffEncoder;
         _tiffPipeline = tiffPipeline;
         _pdfService = pdfService;
+        _ocrService = ocrService;
     }
 
     public async Task<BatchJob> RunAsync(BatchJob job, IProgress<BatchProgress>? progress = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(job);
-
-        if (job.ExportSettings.Format == OutputFormat.PdfSearchable)
-        {
-            // Falha o lote inteiro de uma vez, antes de processar qualquer item — mais claro do
-            // que descobrir isso item a item (seção 109: depende do OCR, ainda não implementado).
-            throw new PdfProcessingException(
-                "PDF pesquisável (com camada de texto do OCR) será implementado na Fase 9.",
-                $"{nameof(OutputFormat.PdfSearchable)} ainda não é suportado por {nameof(BatchProcessingService)}.");
-        }
 
         var gate = _gates.GetOrAdd(job.Id, static _ => new PauseGate());
         try

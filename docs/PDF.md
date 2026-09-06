@@ -2,13 +2,14 @@
 
 > **Status:** Fase 6 concluída — leitura/rasterização de PDFs existentes, geração de PDF
 > imagem-only (Documental/Cor/Escala de cinza), conversão TIFF → PDF. A camada de texto
-> invisível de OCR (PDF pesquisável) fica para a Fase 9 (seção 109).
+> invisível de OCR (PDF pesquisável) foi implementada na Fase 9 (seção 109) — ver
+> "Camada de texto pesquisável (Fase 9)", abaixo, e `docs/OCR.md`.
 
 ## Bibliotecas (ver `THIRD_PARTY_LICENSES.md`)
 
-- **PDFsharp** (MIT) — escrita de PDF. Usada só no nível de objeto de página/imagem
-  (`PdfDocument`, `PdfPage`, `XGraphics.DrawImage`) — nenhum texto é desenhado por ela nesta
-  fase (ver "Por que não há camada de texto ainda", abaixo).
+- **PDFsharp** (MIT) — escrita de PDF. Usada no nível de objeto de página/imagem
+  (`PdfDocument`, `PdfPage`, `XGraphics.DrawImage`) e, desde a Fase 9, também para desenhar a
+  camada de texto invisível (`XGraphics.DrawString`) — ver "Camada de texto pesquisável", abaixo.
 - **PDFtoImage** (MIT, sobre o motor PDFium do Chromium — Apache 2.0/BSD) — rasterização de
   páginas de um PDF existente em imagem. Já traz o SkiaSharp consigo (devolve `SKBitmap`
   diretamente) e roda de forma **idêntica em Windows/Linux/macOS**, sem depender de GDI+/WPF —
@@ -38,22 +39,34 @@ qualquer leitor mostre o documento na escala 1:1 correta, exatamente como o TIFF
   string vazia) quando não há texto nativo — o caso comum de um PDF imagem-only — para o
   chamador distinguir "sem texto" de "o OCR ainda não rodou" (seção 109).
 
-### Por que não há camada de texto ainda
+### Camada de texto pesquisável (Fase 9)
 
-`IPdfService.WritePdfAsync` já aceita `ocrTextPerPage` (para a Fase 9 poder plugar sem quebrar o
-contrato), mas pedir `PdfMode.Searchable`/`IncludeOcrTextLayer` hoje falha com uma mensagem clara
-("será implementado na Fase 9") em vez de gerar um PDF incompleto. Dois motivos:
+`WritePdfAsync` recebe, opcionalmente, um `OcrResult` por página (`ocrResults`, na mesma ordem
+de `pages`). Quando `PdfSettings.Mode` é `PdfMode.Searchable` (ou `IncludeOcrTextLayer` é
+verdadeiro), cada `OcrBlock` (palavra + posição, produzido pelo motor de OCR da Fase 9 — ver
+`docs/OCR.md`) vira um `XGraphics.DrawString` com um `XSolidBrush` **totalmente transparente**
+(`alpha = 0`), posicionado exatamente sobre a palavra correspondente na imagem — o PDF fica
+visualmente idêntico a um PDF comum, mas com texto selecionável/pesquisável em praticamente
+qualquer leitor. Pedir `Searchable`/`IncludeOcrTextLayer` sem informar `ocrResults` (ou com uma
+contagem de itens diferente da de `pages`) falha cedo, com uma mensagem clara, em vez de gerar
+um PDF incompleto.
 
-1. **Escopo:** "PDF pesquisável" está explicitamente listado como entregável da Fase 9 (seção
-   109), junto do motor de OCR — faz sentido implementá-los juntos, quando existirem as posições
-   de cada palavra reconhecida (o parâmetro atual só recebe uma string por página, sem
-   coordenadas).
-2. **Fontes no build "CORE" (sem GDI+) do PDFsharp:** desenhar texto via `XGraphics.DrawString`
-   exige um `IFontResolver` registrado globalmente (`GlobalFontSettings.FontResolver`) — em
-   Linux/macOS não há garantia de nenhuma fonte do sistema disponível, e o próprio PDFsharp não
-   embute nenhuma por padrão fora do Windows. Configurar isso corretamente (bundlar uma fonte
-   com licença permissiva, implementar o resolver) é trabalho real que só vale a pena fazer uma
-   vez, junto da Fase 9.
+Duas decisões de implementação, específicas do build "CORE" (sem GDI+/WPF) do PDFsharp usado
+fora do Windows:
+
+1. **Fonte embutida (`EmbeddedFontResolver`):** desenhar texto via `XGraphics.DrawString` exige
+   um `IFontResolver` registrado globalmente (`GlobalFontSettings.FontResolver`) — em
+   Linux/macOS não há garantia de nenhuma fonte do sistema disponível, e o PDFsharp não embute
+   nenhuma por padrão fora do Windows. A solução: embutir a fonte **Noto Sans** (variável,
+   `NotoSans[wdth,wght].ttf`, SIL Open Font License 1.1 — ver `THIRD_PARTY_LICENSES.md`) como
+   recurso do próprio assembly `SCANOVA.Pdf`, e um resolver mínimo que sempre resolve para essa
+   única fonte — como o texto é invisível, não importa qual fonte é usada (só a posição/tamanho
+   dos glifos afeta a seleção no leitor), então uma única família cobre todos os casos.
+2. **"Invisível" via alfa zero, não o modo de renderização 3 do PDF:** o formato PDF define um
+   modo de texto dedicado para texto invisível-mas-pesquisável (`Tr 3`), mas o PDFsharp não expõe
+   esse modo publicamente. Desenhar com um pincel `alpha = 0` (`XColor.FromArgb(0, 0, 0, 0)`)
+   produz o mesmo resultado prático — invisível a olho nu, mas presente no fluxo de texto do PDF
+   para seleção/busca — em praticamente todos os leitores testados.
 
 ## SCANOVA.Pdf.PdfRasterizer.PdfToImagePdfRasterizer (`IPdfRasterizer`)
 
@@ -79,7 +92,10 @@ fonte embutido). Isso evita completamente o problema do `IFontResolver` descrito
 não pede ao PDFsharp para desenhar texto, só verifica que o extrator (PdfPig) lê corretamente um
 PDF que contém texto de verdade.
 
-## Próximas fases
+## Fases relacionadas
 
 - Fase 8: `RasterizeAllAsync`/`ConvertTiffToPdfAsync` entram no pipeline de conversão em lote.
-- Fase 9: camada de texto invisível de OCR (PDF pesquisável), com posições reais por palavra.
+- Fase 9: camada de texto invisível de OCR (PDF pesquisável), com posições reais por palavra —
+  ver `docs/OCR.md`. Testado de ponta a ponta em `PdfSharpPdfServiceTests` (escreve um PDF
+  pesquisável e re-extrai o texto via `TryExtractTextAsync`, confirmando que ambas as palavras
+  aparecem na posição esperada).

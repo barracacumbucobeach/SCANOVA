@@ -13,15 +13,12 @@ namespace SCANOVA.Pdf.PdfWriter;
 /// Implementação de <see cref="IPdfService"/> usando PDFsharp (MIT) para escrita e PdfPig
 /// (Apache 2.0) para extração de texto nativo. Gera PDFs "imagem-only" (cada página é uma
 /// imagem PNG/JPEG embutida, do tamanho físico exato da página, calculado a partir do DPI da
-/// imagem) — o mesmo modelo usado pela maioria dos aplicativos de digitalização.
+/// imagem) — o mesmo modelo usado pela maioria dos aplicativos de digitalização. Quando
+/// <see cref="PdfMode.Searchable"/>/<see cref="PdfSettings.IncludeOcrTextLayer"/> é pedido junto
+/// de <c>ocrResults</c>, cada bloco reconhecido pelo OCR (Fase 9) vira uma camada de texto
+/// invisível posicionada sobre a imagem — ver <see cref="EmbeddedFontResolver"/> e
+/// <c>docs/PDF.md</c>.
 /// </summary>
-/// <remarks>
-/// A camada de texto invisível de OCR (<see cref="PdfMode.Searchable"/> /
-/// <see cref="PdfSettings.IncludeOcrTextLayer"/>) ainda não está implementada aqui — depende do
-/// motor de OCR (Fase 9, seção 109), que fornece tanto o texto quanto a posição de cada palavra.
-/// Pedir esse modo agora falha com uma mensagem clara em vez de gerar um PDF incompleto/incorreto
-/// silenciosamente.
-/// </remarks>
 public sealed class PdfSharpPdfService : IPdfService
 {
     private readonly ITiffEncoder _tiffEncoder;
@@ -29,13 +26,14 @@ public sealed class PdfSharpPdfService : IPdfService
     public PdfSharpPdfService(ITiffEncoder tiffEncoder)
     {
         _tiffEncoder = tiffEncoder;
+        EmbeddedFontResolver.EnsureRegistered();
     }
 
     public Task WritePdfAsync(
         IReadOnlyList<RasterImage> pages,
         PdfSettings settings,
         string filePath,
-        IReadOnlyList<string>? ocrTextPerPage = null,
+        IReadOnlyList<OcrResult>? ocrResults = null,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(pages);
@@ -49,11 +47,19 @@ public sealed class PdfSharpPdfService : IPdfService
                 $"{nameof(WritePdfAsync)} chamado com uma lista de páginas vazia.");
         }
 
-        if (settings.Mode == PdfMode.Searchable || settings.IncludeOcrTextLayer || ocrTextPerPage is not null)
+        if (ocrResults is not null && ocrResults.Count != pages.Count)
         {
             throw new PdfProcessingException(
-                "PDF pesquisável (com camada de texto do OCR) será implementado na Fase 9.",
-                $"{nameof(PdfMode.Searchable)}/{nameof(PdfSettings.IncludeOcrTextLayer)}/{nameof(ocrTextPerPage)} ainda não suportados por {nameof(PdfSharpPdfService)}.");
+                "A lista de resultados de OCR precisa ter uma entrada para cada página.",
+                $"{nameof(pages)}.Count={pages.Count}, {nameof(ocrResults)}.Count={ocrResults.Count}.");
+        }
+
+        var includeTextLayer = settings.Mode == PdfMode.Searchable || settings.IncludeOcrTextLayer;
+        if (includeTextLayer && ocrResults is null)
+        {
+            throw new PdfProcessingException(
+                "PDF pesquisável exige o resultado do reconhecimento de texto (OCR) de cada página.",
+                $"{nameof(PdfMode.Searchable)}/{nameof(PdfSettings.IncludeOcrTextLayer)} pedido sem {nameof(ocrResults)}.");
         }
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -67,10 +73,11 @@ public sealed class PdfSharpPdfService : IPdfService
                     Info = { Creator = "SCANOVA", Title = Path.GetFileNameWithoutExtension(filePath) },
                 };
 
-                foreach (var page in pages)
+                for (var i = 0; i < pages.Count; i++)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    AddImagePage(document, page, settings);
+                    var ocrResult = includeTextLayer ? ocrResults![i] : null;
+                    AddImagePage(document, pages[i], settings, ocrResult);
                 }
 
                 var directory = Path.GetDirectoryName(filePath);
@@ -117,7 +124,7 @@ public sealed class PdfSharpPdfService : IPdfService
         // Seção 31: todas as páginas do TIFF (multipágina ou não) viram páginas do PDF, na ordem.
         var pages = await _tiffEncoder.DecodeAsync(tiffPath, cancellationToken).ConfigureAwait(false);
 
-        await WritePdfAsync(pages, settings, outputPdfPath, ocrTextPerPage: null, cancellationToken).ConfigureAwait(false);
+        await WritePdfAsync(pages, settings, outputPdfPath, ocrResults: null, cancellationToken).ConfigureAwait(false);
     }
 
     public Task<string?> TryExtractTextAsync(string pdfPath, int pageIndex, CancellationToken cancellationToken = default)
@@ -168,7 +175,7 @@ public sealed class PdfSharpPdfService : IPdfService
         }, cancellationToken);
     }
 
-    private static void AddImagePage(PdfDocument document, RasterImage image, PdfSettings settings)
+    private static void AddImagePage(PdfDocument document, RasterImage image, PdfSettings settings, OcrResult? ocrResult)
     {
         ValidatePageAgainstMode(image, settings.Mode);
 
@@ -192,6 +199,46 @@ public sealed class PdfSharpPdfService : IPdfService
         using var xImage = XImage.FromStream(stream);
         using var gfx = XGraphics.FromPdfPage(page);
         gfx.DrawImage(xImage, 0, 0, page.Width.Point, page.Height.Point);
+
+        if (ocrResult is not null)
+        {
+            DrawInvisibleTextLayer(gfx, ocrResult, dpiX, dpiY);
+        }
+    }
+
+    /// <summary>
+    /// Desenha cada bloco reconhecido pelo OCR como texto totalmente transparente (alfa 0),
+    /// posicionado exatamente sobre a região correspondente da imagem — invisível ao abrir o
+    /// PDF, mas selecionável/pesquisável em qualquer leitor (seção 109-111). Não é o modo de
+    /// renderização "invisível" (Tr 3) dedicado do PDF — o PDFsharp não expõe isso publicamente
+    /// — mas o resultado prático (invisível + pesquisável) é o mesmo na grande maioria dos
+    /// leitores.
+    /// </summary>
+    private static void DrawInvisibleTextLayer(XGraphics gfx, OcrResult ocrResult, double dpiX, double dpiY)
+    {
+        var brush = new XSolidBrush(XColor.FromArgb(0, 0, 0, 0));
+
+        foreach (var block in ocrResult.Blocks)
+        {
+            if (string.IsNullOrWhiteSpace(block.Text))
+            {
+                continue;
+            }
+
+            var x = block.BoundingBox.X / dpiX * 72.0;
+            var y = block.BoundingBox.Y / dpiY * 72.0;
+            var width = block.BoundingBox.Width / dpiX * 72.0;
+            var height = block.BoundingBox.Height / dpiY * 72.0;
+            if (width <= 0 || height <= 0)
+            {
+                continue;
+            }
+
+            // Aproximação razoável de altura de caixa → tamanho de fonte (a proporção exata
+            // varia por fonte, mas não importa aqui: o texto nunca é visto, só selecionado).
+            var font = new XFont(EmbeddedFontResolver.FamilyName, Math.Max(1.0, height * 0.8));
+            gfx.DrawString(block.Text, font, brush, new XRect(x, y, width, height), XStringFormats.TopLeft);
+        }
     }
 
     private static void ValidatePageAgainstMode(RasterImage image, PdfMode mode)
