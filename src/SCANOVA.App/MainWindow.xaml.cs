@@ -84,7 +84,7 @@ public sealed partial class MainWindow : Window
 
         if (args.IsSettingsSelected)
         {
-            navigation.NavigateToPlaceholder("Configurações", "A tela de configurações completa (seção 48) será implementada ao longo das próximas fases.");
+            navigation.NavigateTo(typeof(SettingsPage));
             return;
         }
 

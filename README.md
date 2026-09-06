@@ -64,7 +64,15 @@ atual:
       "Extrair texto" (Dashboard → "Extrair texto", ou item de navegação "OCR"): abre um
       documento, reconhece o texto, permite revisar/corrigir antes de salvar. A conversão em
       lote (Fase 8) também passa a suportar `PdfSearchable` de ponta a ponta.
-- [ ] Fase 10 — Licenciamento
+- [x] **Fase 10 — Licenciamento**: licença vitalícia (`ILicenseService`) ativada por uma chave
+      assinada digitalmente (ECDSA P-256) — validação 100% local, sem servidor de ativação nem
+      conexão com a internet. O aplicativo embute só a chave pública (nunca a privada); chaves
+      novas são emitidas offline por uma ferramenta separada do fabricante
+      (`tools/SCANOVA.LicenseTool`), que nunca é distribuída com o aplicativo. Licença ativada
+      fica protegida em disco por DPAPI (`SecureLicenseStore`), amarrada à conta do Windows da
+      máquina. Lista de revogação embutida (atualizada a cada versão), também consultada
+      offline. Nova tela "Configurações" (item "Configurações" do menu lateral, antes um
+      placeholder): status da licença, ativação por chave, desativação.
 - [ ] Fase 11 — Polimento e instalador
 
 ## Estrutura
@@ -85,8 +93,12 @@ src/
 ├── SCANOVA.Licensing/           — licenciamento vitalício
 └── SCANOVA.Infrastructure/      — logging, configurações, arquivos temporários, diagnóstico
 
+tools/
+└── SCANOVA.LicenseTool/         — ferramenta do FABRICANTE (gera chaves, emite licenças) —
+                                   nunca é distribuída com o aplicativo, ver docs/LICENSING.md
+
 tests/                          — um projeto de teste por camada + testes de integração
-docs/                            — documentação técnica (arquitetura, TIFF, scanner, OCR, PDF, build, testes)
+docs/                            — documentação técnica (arquitetura, TIFF, scanner, OCR, PDF, licenciamento, build, testes)
 ```
 
 ## Por que a UI não compila neste ambiente

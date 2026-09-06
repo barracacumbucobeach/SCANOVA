@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Ferramenta interna do FABRICANTE (não faz parte do aplicativo distribuído aos clientes):
+    gera o par de chaves ECDSA usado para assinar licenças e emite novas chaves de licença
+    assinadas. Só a CHAVE PÚBLICA gerada aqui é embutida em SCANOVA.Licensing
+    (LicenseSigningPublicKey) — a chave PRIVADA nunca deve ser commitada neste repositório nem
+    distribuída com o aplicativo; deve ficar guardada offline, em local seguro, só com o
+    fabricante (ver docs/LICENSING.md).
+
+    Implementa de forma independente o mesmo formato binário de envelope usado por
+    SCANOVA.Licensing (ver docs/LICENSING.md) — deliberadamente sem referenciar o projeto do
+    aplicativo: quem assina uma licença não precisa (e não deveria) depender dos internals de
+    quem a verifica.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SCANOVA.LicenseTool</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+</Project>

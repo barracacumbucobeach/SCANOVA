@@ -31,6 +31,13 @@ distribuição comercial fechada sem exigir a abertura do código-fonte do SCANO
 | tessdata_fast (modelos de idioma do Tesseract) | N/A (dados, baixados sob demanda em tempo de execução, não empacotados) | Apache 2.0 (verificado em `LICENSE` no repositório) | Modelos LSTM "rápidos" oficiais do Tesseract para reconhecimento de texto impresso, em português/inglês/espanhol + orientação (osd) — baixados e armazenados em cache local na primeira vez que um idioma é usado (seção 41) | https://github.com/tesseract-ocr/tessdata_fast |
 | DocumentFormat.OpenXml | 3.5.1 | MIT (verificado em `LICENSE` no repositório) | Exportação do texto reconhecido para DOCX (Word) | https://github.com/dotnet/Open-XML-SDK |
 | Noto Sans (fonte, `NotoSans[wdth,wght].ttf`) | N/A (fonte, arquivo estático embutido como recurso) | SIL Open Font License 1.1 (verificado em `OFL.txt`, incluído junto do arquivo da fonte) | Fonte embutida no assembly `SCANOVA.Pdf` para desenhar a camada de texto invisível/pesquisável do PDF (seção 109-111) — necessária porque o build do PDFsharp usado fora do Windows não tem acesso a nenhuma fonte do sistema por padrão | https://github.com/google/fonts/tree/main/ofl/notosans |
+| System.Security.Cryptography.ProtectedData | 8.0.0 | MIT (parte do próprio repositório dotnet/runtime, mesma licença já usada por Microsoft.Extensions.DependencyInjection acima) | Publica a DPAPI (Windows Data Protection API) para .NET moderno — só usada por `SecureLicenseStore` para criptografar a licença ativada em disco (Fase 10, seção: armazenamento seguro) | https://github.com/dotnet/runtime |
+
+## Bibliotecas próprias (não distribuídas com o aplicativo)
+
+| Ferramenta | Onde vive | Por que não é uma dependência de terceiros | Nunca faz parte de |
+|---|---|---|---|
+| ECDSA P-256 (assinatura/verificação de licenças) | `System.Security.Cryptography` (BCL do próprio .NET, sem pacote NuGet adicional) | Já faz parte do runtime .NET incluído no aplicativo — nenhuma licença de terceiro a mais para documentar | A chave PRIVADA de assinatura nunca faz parte de nenhum artefato distribuído — ver `docs/LICENSING.md` |
 
 ## Explicitamente evitadas
 

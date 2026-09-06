@@ -1,0 +1,69 @@
+<Page
+    x:Class="SCANOVA.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="640" HorizontalAlignment="Left" Margin="32,24,32,24" Spacing="24">
+
+            <TextBlock Text="Configurações" Style="{ThemeResource TitleLargeTextBlockStyle}" />
+
+            <!-- Fase 10: licença vitalícia — ativação por chave, sem servidor, sem mensalidade. -->
+            <StackPanel Spacing="12">
+                <TextBlock Text="Licença" Style="{ThemeResource SubtitleTextBlockStyle}" />
+
+                <InfoBar
+                    IsOpen="True"
+                    IsClosable="False"
+                    Title="{x:Bind ViewModel.StatusText, Mode=OneWay}"
+                    Severity="{x:Bind ViewModel.IsLicensed, Mode=OneWay, Converter={StaticResource BoolToInfoBarSeverityConverter}}" />
+
+                <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.HasLicenseInfo, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="{x:Bind ViewModel.EditionText, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.CustomerText, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.LicenseIdText, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
+                <TextBlock
+                    Text="Cole abaixo a chave de licença que você recebeu após a compra."
+                    Style="{ThemeResource BodyTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap" />
+
+                <TextBox
+                    Text="{x:Bind ViewModel.LicenseKeyInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PlaceholderText="Chave de licença"
+                    AcceptsReturn="True"
+                    TextWrapping="Wrap"
+                    Height="80" />
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button
+                        Content="Ativar licença"
+                        Command="{x:Bind ViewModel.ActivateCommand}"
+                        Style="{ThemeResource AccentButtonStyle}" />
+                    <Button
+                        Content="Desativar licença nesta máquina"
+                        Command="{x:Bind ViewModel.DeactivateCommand}"
+                        Visibility="{x:Bind ViewModel.HasLicenseInfo, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" Width="20" Height="20" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Seção "Sobre" — as demais seções de configurações (aparência, acessibilidade
+                 etc.) chegam na Fase 11 (Polimento). -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Sobre" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="{x:Bind ViewModel.AppVersionText, Mode=OneWay}" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <TextBlock
+                    Text="Licença vitalícia por versão adquirida — sem assinatura, sem mensalidade."
+                    Style="{ThemeResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -13,6 +13,7 @@
 
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <converters:BoolToInfoBarSeverityConverter x:Key="BoolToInfoBarSeverityConverter" />
 
             <!-- Cor de marca principal do SCANOVA (seção 8: cor principal + tons neutros + estados semânticos). -->
             <Color x:Key="ScanovaBrandColor">#1F4FD8</Color>
