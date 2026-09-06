@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Projeto WinUI 3 (Windows App SDK) — requer Windows + Visual Studio 2022 (workload
+    ".NET Desktop Development" + "Windows App SDK C#/WinRT") para restaurar e compilar.
+    NÃO compila em Linux/macOS: os pacotes de referência do Windows SDK e o compilador XAML
+    exigem o SDK do Windows. Ver docs/BUILD.md.
+
+    Modelo de implantação: "Unpackaged" (WindowsPackageType=None) nesta fase — evita exigir
+    um Package.appxmanifest com ícones MSIX antes de termos os assets de marca definitivos.
+    O empacotamento MSIX/instalador será tratado na Fase 11 (seção 91).
+  -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>SCANOVA.App</RootNamespace>
+    <AssemblyName>SCANOVA</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SCANOVA.Core\SCANOVA.Core.csproj" />
+    <ProjectReference Include="..\SCANOVA.Infrastructure\SCANOVA.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

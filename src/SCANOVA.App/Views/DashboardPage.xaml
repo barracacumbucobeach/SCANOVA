@@ -1,0 +1,95 @@
+<Page
+    x:Class="SCANOVA.App.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="32,24,32,24">
+        <StackPanel Spacing="24" MaxWidth="960" HorizontalAlignment="Left">
+
+            <!-- Seção 133: introdução curta de primeiro uso, dispensável, não bloqueante. -->
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.ShowWelcomeBanner, Mode=OneWay}"
+                Severity="Informational"
+                Title="Bem-vindo ao SCANOVA"
+                Message="Digitalize, trate e converta seus documentos em poucos passos."
+                IsClosable="True"
+                Closed="WelcomeBanner_Closed">
+                <InfoBar.ActionButton>
+                    <Button Content="Digitalizar meu primeiro documento" Command="{x:Bind ViewModel.ScanDocumentCommand}" />
+                </InfoBar.ActionButton>
+            </InfoBar>
+
+            <TextBlock Text="O que você deseja fazer?" Style="{ThemeResource TitleLargeTextBlockStyle}" />
+
+            <Grid ColumnSpacing="16" RowSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ScanDocumentCommand}">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE8B9;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <TextBlock Text="Digitalizar documento" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                        <TextBlock Text="Digitalize usando um scanner instalado." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.OpenDocumentCommand}">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE8E5;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <TextBlock Text="Abrir documento" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                        <TextBlock Text="Abra uma imagem ou PDF." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ConvertCommand}">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE895;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <TextBlock Text="Converter" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                        <TextBlock Text="Converta documentos entre formatos." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ComposeDuplexCommand}">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE8F1;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <TextBlock Text="Frente + verso" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                        <TextBlock Text="Combine frente e verso em um único documento." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.EnhanceDocumentCommand}">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE7B3;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <TextBlock Text="Melhorar documento" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                        <TextBlock Text="Corrija contraste, fundo, nitidez, inclinação e legibilidade." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ExtractTextCommand}">
+                    <StackPanel Spacing="8">
+                        <FontIcon Glyph="&#xE8D2;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <TextBlock Text="Extrair texto" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                        <TextBlock Text="Reconheça o texto de uma imagem ou PDF." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- Seção 134: estado vazio (nenhum documento no histórico ainda). -->
+            <StackPanel Spacing="8" Padding="0,24,0,0">
+                <TextBlock Text="Nenhum documento aberto" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <TextBlock Text="Digitalize um documento ou arraste um arquivo para começar." Style="{ThemeResource CaptionTextBlockStyle}" />
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

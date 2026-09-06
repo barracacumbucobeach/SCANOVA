@@ -1,0 +1,53 @@
+# Build outputs
+bin/
+obj/
+publish/
+installer/
+artifacts/
+
+# Visual Studio / Rider
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+.idea/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Logs, temporários e dados locais gerados em runtime — nunca versionar (seção 47, 59, 121)
+Logs/
+Temp/
+*.log
+
+# Segredos e chaves — nunca versionar (seção 120, 121)
+*.pfx
+*.snk
+*.pem
+*.key
+secrets.json
+appsettings.local.json
+.env
+.env.*
+
+# Documentos de teste com dados pessoais nunca devem ser versionados (seção 122);
+# arquivos sintéticos de teste ficam em tests/**/TestData e são versionados normalmente.
