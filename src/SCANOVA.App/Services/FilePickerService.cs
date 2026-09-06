@@ -73,6 +73,20 @@ public sealed class FilePickerService : IFilePickerService
         return file?.Path;
     }
 
+    public async Task<string?> PickFolderAsync()
+    {
+        var picker = new FolderPicker
+        {
+            SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+        };
+        picker.FileTypeFilter.Add("*");
+
+        InitializeWithWindow.Initialize(picker, GetActiveWindowHandle());
+
+        var folder = await picker.PickSingleFolderAsync();
+        return folder?.Path;
+    }
+
     private static IntPtr GetActiveWindowHandle()
     {
         var window = App.MainAppWindow ?? throw new InvalidOperationException("A janela principal ainda não foi criada.");

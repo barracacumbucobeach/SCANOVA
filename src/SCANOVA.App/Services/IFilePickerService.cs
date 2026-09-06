@@ -18,4 +18,10 @@ public interface IFilePickerService
     /// (ex.: "Imagem PNG") para a lista de extensões aceitas (ex.: [".png"]).
     /// </summary>
     Task<string?> PickSaveFileAsync(string suggestedFileName, IReadOnlyDictionary<string, IList<string>> fileTypeChoices);
+
+    /// <summary>
+    /// Abre o seletor de pasta (destino da conversão em lote — Fase 8). Retorna <c>null</c> se o
+    /// usuário cancelar.
+    /// </summary>
+    Task<string?> PickFolderAsync();
 }

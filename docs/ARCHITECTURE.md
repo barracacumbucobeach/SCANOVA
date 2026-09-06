@@ -9,9 +9,9 @@ domínio, processamento e infraestrutura (princípio de desenvolvimento #2 da es
 SCANOVA.App            (UI — WinUI 3, Windows-only)
    │
    ├── depende de → SCANOVA.Infrastructure, SCANOVA.Core
-   │                (e, nas próximas fases: Imaging, Tiff, Pdf, Ocr, Scanner, Licensing)
+   │                (e, nas próximas fases: Imaging, Tiff, Pdf, Batch, Ocr, Scanner, Licensing)
    │
-SCANOVA.Imaging / Tiff / Pdf / Ocr / Scanner / Licensing   (processamento — .NET 8 puro)
+SCANOVA.Imaging / Tiff / Pdf / Batch / Ocr / Scanner / Licensing   (processamento — .NET 8 puro)
    │
    └── dependem de → SCANOVA.Core
 

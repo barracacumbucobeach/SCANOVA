@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using SCANOVA.App.Services;
 using SCANOVA.App.ViewModels;
+using SCANOVA.Batch;
 using SCANOVA.Core.Interfaces;
 using SCANOVA.Imaging;
 using SCANOVA.Infrastructure;
@@ -38,6 +39,7 @@ public partial class App : Application
         services.AddScanovaImaging();
         services.AddScanovaTiff();
         services.AddScanovaPdf();
+        services.AddScanovaBatch();
         services.AddScanovaScanner();
 
         services.AddSingleton<INavigationService, FrameNavigationService>();
@@ -48,6 +50,7 @@ public partial class App : Application
         services.AddTransient<DocumentViewerViewModel>();
         services.AddTransient<ScanViewModel>();
         services.AddTransient<DuplexComposeViewModel>();
+        services.AddTransient<BatchConvertViewModel>();
 
         return services.BuildServiceProvider();
     }

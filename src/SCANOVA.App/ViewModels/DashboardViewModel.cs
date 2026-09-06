@@ -96,7 +96,7 @@ public sealed partial class DashboardViewModel : ObservableObject
 
     [RelayCommand]
     private void Convert() =>
-        _navigation.NavigateToPlaceholder("Converter", "A conversão entre formatos e o processamento em lote serão implementados na Fase 8.");
+        _navigation.NavigateTo(typeof(BatchConvertPage));
 
     [RelayCommand]
     private void ComposeDuplex() =>

@@ -105,7 +105,7 @@ public sealed partial class MainWindow : Window
                 navigation.NavigateToPlaceholder("Documentos", "Use \"Abrir documento\" no Início para abrir uma imagem. Uma lista de documentos recentes/multi-página será adicionada em uma próxima etapa.");
                 break;
             case "Convert":
-                navigation.NavigateToPlaceholder("Converter", "A conversão entre formatos e o processamento em lote serão implementados na Fase 8.");
+                navigation.NavigateTo(typeof(BatchConvertPage));
                 break;
             case "Compose":
                 navigation.NavigateTo(typeof(DuplexComposePage));

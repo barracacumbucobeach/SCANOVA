@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <!-- Sem referência direta ao SkiaSharp.NativeAssets.Linux — já vem transitivamente por
+         SCANOVA.Pdf → PDFtoImage, numa versão mais nova; declarar aqui causaria um "package
+         downgrade" (mesmo raciocínio de SCANOVA.Pdf.Tests). -->
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SCANOVA.Batch\SCANOVA.Batch.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Core\SCANOVA.Core.csproj" />
+    <!-- Só o projeto de testes referencia as implementações concretas — serviços reais
+         (não mocks), para testar o lote de ponta a ponta contra o pipeline de verdade. -->
+    <ProjectReference Include="..\..\src\SCANOVA.Imaging\SCANOVA.Imaging.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Tiff\SCANOVA.Tiff.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Pdf\SCANOVA.Pdf.csproj" />
+  </ItemGroup>
+
+</Project>

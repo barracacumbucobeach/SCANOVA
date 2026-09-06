@@ -47,7 +47,12 @@ atual:
       2, verso 2, ...), com opções para inverter a ordem do verso (fluxo de duplex manual mais
       comum) e girar o verso 180°. Nova tela "Frente e verso" (Dashboard → "Frente + verso"):
       carrega dois lotes de imagens e salva como TIFF Documental multipágina.
-- [ ] Fase 8 — Conversão em lote
+- [x] **Fase 8 — Conversão em lote**: `IBatchProcessingService` processa uma fila de arquivos um
+      por vez (nunca carrega o lote inteiro em memória), preservando o nome de cada arquivo de
+      origem no destino. Suporta TIFF Documental/genérico, PNG, JPG e PDF; uma falha em um item
+      nunca derruba o lote (relatório final com sucesso/falha por item). Pausa/retomada
+      (`SemaphoreSlim`, sem ocupar threads) e cancelamento cooperativo, mesmo enquanto pausado.
+      Nova tela "Converter em lote" (Dashboard → "Converter").
 - [ ] Fase 9 — OCR
 - [ ] Fase 10 — Licenciamento
 - [ ] Fase 11 — Polimento e instalador
@@ -64,6 +69,7 @@ src/
 ├── SCANOVA.Imaging/             — carregamento e processamento de imagem (SkiaSharp)
 ├── SCANOVA.Tiff/                — encoder/validador TIFF, CCITT Group 4, 200 DPI
 ├── SCANOVA.Pdf/                 — leitura, rasterização e geração de PDF
+├── SCANOVA.Batch/                — conversão em lote (fila, progresso, pausa/cancelamento)
 ├── SCANOVA.Ocr/                 — reconhecimento de texto local
 ├── SCANOVA.Scanner/             — abstração de digitalização (WIA no Windows)
 ├── SCANOVA.Licensing/           — licenciamento vitalício
@@ -77,7 +83,7 @@ docs/                            — documentação técnica (arquitetura, TIFF,
 
 `SCANOVA.App` usa WinUI 3 (Windows App SDK), cujo compilador de XAML é um executável nativo do
 Windows — **não compila em Linux/macOS**. Todas as demais camadas (`Core`, `Infrastructure`,
-`Imaging`, `Tiff`, `Pdf`, `Ocr`, `Scanner`, `Licensing`) são bibliotecas .NET 8 puras,
+`Imaging`, `Tiff`, `Pdf`, `Batch`, `Ocr`, `Scanner`, `Licensing`) são bibliotecas .NET 8 puras,
 multiplataforma, com testes reais executados neste ambiente. Use
 `SCANOVA.CrossPlatform.slnf` para compilar/testar tudo o que não depende de Windows. Veja
 `docs/BUILD.md` para instruções completas de build em cada plataforma.

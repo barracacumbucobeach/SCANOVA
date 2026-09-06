@@ -45,6 +45,7 @@
     <ProjectReference Include="..\SCANOVA.Imaging\SCANOVA.Imaging.csproj" />
     <ProjectReference Include="..\SCANOVA.Tiff\SCANOVA.Tiff.csproj" />
     <ProjectReference Include="..\SCANOVA.Pdf\SCANOVA.Pdf.csproj" />
+    <ProjectReference Include="..\SCANOVA.Batch\SCANOVA.Batch.csproj" />
     <ProjectReference Include="..\SCANOVA.Scanner\SCANOVA.Scanner.csproj" />
   </ItemGroup>
 
