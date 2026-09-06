@@ -1,6 +1,6 @@
 # Processamento de imagem
 
-> **Status:** Fases 2, 3 (binarização) e 5 (automação/melhoria) concluídas.
+> **Status:** Fases 2, 3 (binarização), 5 (automação/melhoria) e 7 (composição frente/verso) concluídas.
 
 ## SCANOVA.Imaging (Fase 2)
 
@@ -108,3 +108,35 @@ No visualizador (`DocumentViewerPage`), o cartão "Melhorar documento" do Dashbo
 documento e dois botões novos ficam disponíveis: **Melhorar automaticamente** (aplica
 `AutoEnhance` com o preset Normal) e **Reverter para original** (edição não destrutiva — volta à
 imagem original a qualquer momento antes de salvar).
+
+## Composição frente/verso (`SCANOVA.Imaging.Composition`, Fase 7)
+
+Para scanners **sem** alimentador com duplex automático (o caso coberto por
+`ScanSource.FeederDuplex`, Fase 4): o usuário escaneia (ou abre) todas as páginas de um lado,
+vira a pilha física de papel e repete para o outro lado — dois lotes de imagens separados que
+precisam virar um único documento multipágina, na ordem certa.
+
+`IDuplexCompositionService` (`DuplexCompositionService`) faz só isso: intercala
+`frontPages`/`backPages` (frente 1, verso 1, frente 2, verso 2, ...), exigindo a mesma
+quantidade de páginas nas duas listas (`DuplexCompositionException` com uma mensagem clara caso
+contrário). `DuplexCompositionOptions` cobre as duas variações físicas mais comuns:
+
+- **`ReverseBackOrder`** — inverte a lista de versos antes de intercalar. Necessário no fluxo de
+  duplex manual mais comum: escanear a pilha de frentes (saem na ordem 1, 2, 3...), virar a
+  pilha **inteira** de uma vez (sem reordenar folha por folha) e escanear de novo — os versos
+  saem na ordem inversa (verso de N primeiro). Falso por padrão (assume que os versos já saíram
+  na mesma ordem das frentes) — nada aqui é adivinhado automaticamente a partir do hardware; a
+  interface deixa o usuário confirmar (seção 45 — nunca uma operação silenciosa/destrutiva).
+- **`RotateBackPages180`** — gira cada verso 180° (via `IImageService.Rotate`, já testado) antes
+  de compor, para o caso em que o alimentador entrega o verso de cabeça para baixo.
+
+### SCANOVA.App — tela "Frente e verso" (Fase 7)
+
+Nova página (Dashboard → cartão "Frente + verso", ou item de navegação "Compor"):
+`DuplexComposeViewModel` mantém dois lotes de páginas (frente/verso), carregados via seletor de
+arquivo com múltipla seleção (`IFilePickerService.PickMultipleImageFilesAsync`, nova). Com as
+duas contagens iguais e maiores que zero, "Compor e salvar documento" fica habilitado: chama
+`IDuplexCompositionService.Compose` e salva o resultado como TIFF Documental multipágina
+(reaproveita `ITiffDocumentPipeline.SaveDocumentalTiffMultiPageAsync`, já existente desde a Fase
+3 — cada página é normalizada/binarizada independentemente, então lotes com formatos de pixel
+diferentes entre si funcionam sem nenhum tratamento especial aqui).

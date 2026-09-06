@@ -47,6 +47,7 @@ public partial class App : Application
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<DocumentViewerViewModel>();
         services.AddTransient<ScanViewModel>();
+        services.AddTransient<DuplexComposeViewModel>();
 
         return services.BuildServiceProvider();
     }

@@ -100,7 +100,7 @@ public sealed partial class DashboardViewModel : ObservableObject
 
     [RelayCommand]
     private void ComposeDuplex() =>
-        _navigation.NavigateToPlaceholder("Frente + verso", "A composição frente e verso será implementada na Fase 7.");
+        _navigation.NavigateTo(typeof(DuplexComposePage));
 
     /// <summary>
     /// "Melhorar documento" (seção 20): abre um documento existente diretamente no visualizador,

@@ -1,0 +1,70 @@
+<Page
+    x:Class="SCANOVA.App.Views.DuplexComposePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="640" HorizontalAlignment="Left" Margin="32,24,32,24" Spacing="20">
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="Frente e verso" Style="{ThemeResource TitleLargeTextBlockStyle}" />
+                <TextBlock
+                    Text="Para scanners sem alimentador com frente e verso automático: digitalize (ou abra) todas as páginas de um lado, vire a pilha de papel e repita para o outro lado. Depois carregue os dois lotes aqui para juntá-los em um único documento, na ordem certa."
+                    Style="{ThemeResource BodyTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Spacing="8">
+                    <TextBlock Text="Frente" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.FrontCount, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ListView ItemsSource="{x:Bind ViewModel.FrontFileNames}" Height="140" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" />
+                    <Button Content="Adicionar páginas" Command="{x:Bind ViewModel.AddFrontPagesCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Content="Limpar" Command="{x:Bind ViewModel.ClearFrontPagesCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="8">
+                    <TextBlock Text="Verso" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.BackCount, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ListView ItemsSource="{x:Bind ViewModel.BackFileNames}" Height="140" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" />
+                    <Button Content="Adicionar páginas" Command="{x:Bind ViewModel.AddBackPagesCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                    <Button Content="Limpar" Command="{x:Bind ViewModel.ClearBackPagesCommand}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Spacing="8">
+                <ToggleSwitch Header="Inverter a ordem do verso" IsOn="{x:Bind ViewModel.ReverseBackOrder, Mode=TwoWay}" OnContent="Sim" OffContent="Não" />
+                <TextBlock
+                    Text="Ative se o verso saiu na ordem contrária da frente — comum quando a pilha inteira é virada de uma vez, sem reordenar folha por folha."
+                    Style="{ThemeResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap" />
+
+                <ToggleSwitch Header="Girar o verso 180°" IsOn="{x:Bind ViewModel.RotateBackPages180, Mode=TwoWay}" OnContent="Sim" OffContent="Não" />
+                <TextBlock
+                    Text="Ative se as páginas do verso aparecerem de cabeça para baixo."
+                    Style="{ThemeResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Button
+                Content="Compor e salvar documento"
+                Command="{x:Bind ViewModel.ComposeAndSaveCommand}"
+                Style="{ThemeResource AccentButtonStyle}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center" />
+
+            <ProgressRing IsActive="{x:Bind ViewModel.IsBusy, Mode=OneWay}" HorizontalAlignment="Center" Width="32" Height="32" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

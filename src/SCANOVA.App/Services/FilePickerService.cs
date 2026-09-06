@@ -34,6 +34,26 @@ public sealed class FilePickerService : IFilePickerService
         return file?.Path;
     }
 
+    public async Task<IReadOnlyList<string>> PickMultipleImageFilesAsync()
+    {
+        var picker = new FileOpenPicker
+        {
+            SuggestedStartLocation = PickerLocationId.PicturesLibrary,
+        };
+
+        picker.FileTypeFilter.Add(".jpg");
+        picker.FileTypeFilter.Add(".jpeg");
+        picker.FileTypeFilter.Add(".png");
+        picker.FileTypeFilter.Add(".bmp");
+        picker.FileTypeFilter.Add(".gif");
+        picker.FileTypeFilter.Add(".webp");
+
+        InitializeWithWindow.Initialize(picker, GetActiveWindowHandle());
+
+        var files = await picker.PickMultipleFilesAsync();
+        return files.Select(f => f.Path).ToList();
+    }
+
     public async Task<string?> PickSaveFileAsync(string suggestedFileName, IReadOnlyDictionary<string, IList<string>> fileTypeChoices)
     {
         var picker = new FileSavePicker

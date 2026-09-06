@@ -108,7 +108,7 @@ public sealed partial class MainWindow : Window
                 navigation.NavigateToPlaceholder("Converter", "A conversão entre formatos e o processamento em lote serão implementados na Fase 8.");
                 break;
             case "Compose":
-                navigation.NavigateToPlaceholder("Compor", "A composição frente + verso será implementada na Fase 7.");
+                navigation.NavigateTo(typeof(DuplexComposePage));
                 break;
             case "Enhance":
                 navigation.NavigateToPlaceholder("Melhorar", "Use o cartão \"Melhorar documento\" no Início para abrir um documento e melhorá-lo automaticamente (endireitar, corrigir perspectiva, remover fundo/ruído e ajustar tom).");

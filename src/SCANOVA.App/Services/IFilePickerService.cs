@@ -7,6 +7,13 @@ public interface IFilePickerService
     Task<string?> PickImageFileAsync();
 
     /// <summary>
+    /// Abre o seletor de arquivo permitindo escolher várias imagens de uma vez (seção —
+    /// composição frente/verso: carregar um lote de páginas de frente ou de verso). Retorna
+    /// uma lista vazia se o usuário cancelar.
+    /// </summary>
+    Task<IReadOnlyList<string>> PickMultipleImageFilesAsync();
+
+    /// <summary>
     /// Abre o seletor de "salvar como". <paramref name="fileTypeChoices"/> mapeia um rótulo
     /// (ex.: "Imagem PNG") para a lista de extensões aceitas (ex.: [".png"]).
     /// </summary>

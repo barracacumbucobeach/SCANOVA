@@ -42,7 +42,11 @@ atual:
       conversão TIFF → PDF preservando todas as páginas. "Documento PDF" agora é uma opção real
       em "Salvar como" no visualizador. A camada de texto invisível de OCR (PDF pesquisável) fica
       para a Fase 9, quando o motor de OCR fornecer o texto e a posição de cada palavra.
-- [ ] Fase 7 — Composição frente/verso
+- [x] **Fase 7 — Composição frente/verso**: `IDuplexCompositionService` intercala páginas de
+      frente e verso escaneadas/abertas em duas passagens separadas (frente 1, verso 1, frente
+      2, verso 2, ...), com opções para inverter a ordem do verso (fluxo de duplex manual mais
+      comum) e girar o verso 180°. Nova tela "Frente e verso" (Dashboard → "Frente + verso"):
+      carrega dois lotes de imagens e salva como TIFF Documental multipágina.
 - [ ] Fase 8 — Conversão em lote
 - [ ] Fase 9 — OCR
 - [ ] Fase 10 — Licenciamento
