@@ -21,12 +21,12 @@ distribuição comercial fechada sem exigir a abertura do código-fonte do SCANO
 | Microsoft.Windows.SDK.BuildTools | 10.0.28000.2705 | Licença da Microsoft (uso permitido para build/distribuição de apps Windows) | Ferramentas de build referenciadas pelo Windows App SDK | https://www.nuget.org/packages/Microsoft.Windows.SDK.BuildTools |
 | xunit / xunit.runner.visualstudio | 2.4.x | Apache 2.0 / MIT | Testes automatizados (seções 75-77) | https://github.com/xunit/xunit |
 | coverlet.collector | 6.0.0 | MIT | Cobertura de testes | https://github.com/coverlet-coverage/coverlet |
+| BitMiracle.LibTiff.NET | 2.4.660 | Licença estilo BSD-3-Clause (texto completo verificado em https://raw.githubusercontent.com/BitMiracle/libtiff.net/master/license.txt — Copyright Bit Miracle, com trechos herdados do libtiff original de Sam Leffler/Silicon Graphics e do IJG). Permite uso comercial e redistribuição, exige apenas manter o aviso de copyright; proíbe usar o nome "Bit Miracle" para endosso. Compatível com distribuição comercial fechada. | Encoder/decoder TIFF, 1-bit, CCITT Group 4 — requisito comercial crítico do produto (seção 22/23/27) | https://github.com/BitMiracle/libtiff.net |
 
 ## Planejadas para as próximas fases (a confirmar/registrar antes do uso)
 
 | Biblioteca | Licença (a confirmar na fase correspondente) | Finalidade | Fase |
 |---|---|---|---|
-| BitMiracle.LibTiff.NET | Licença estilo BSD (porte gerenciado do libtiff) | Encoder/decoder TIFF, 1-bit, CCITT Group 4 — requisito comercial crítico do produto | Fase 3 |
 | PDF: candidatos — PDFsharp (MIT) para escrita; PDFtoImage/Docnet.Core ou PDFium (Apache 2.0/BSD) para rasterização; PdfPig (Apache 2.0) para extração de texto nativo | A confirmar | Leitura/rasterização/geração de PDF | Fase 6 |
 | Tesseract (motor OCR) + wrapper .NET (ex.: charlesw/tesseract, MIT) | Apache 2.0 (Tesseract) / MIT (wrapper) | OCR local, offline, com modelo em português | Fase 9 |
 | DocumentFormat.OpenXml | MIT | Exportação de texto reconhecido para DOCX | Fase 9 |

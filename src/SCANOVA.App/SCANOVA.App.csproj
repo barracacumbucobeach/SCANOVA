@@ -43,6 +43,7 @@
     <ProjectReference Include="..\SCANOVA.Core\SCANOVA.Core.csproj" />
     <ProjectReference Include="..\SCANOVA.Infrastructure\SCANOVA.Infrastructure.csproj" />
     <ProjectReference Include="..\SCANOVA.Imaging\SCANOVA.Imaging.csproj" />
+    <ProjectReference Include="..\SCANOVA.Tiff\SCANOVA.Tiff.csproj" />
   </ItemGroup>
 
   <ItemGroup>

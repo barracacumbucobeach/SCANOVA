@@ -25,4 +25,24 @@ public interface IImageService
 
     /// <summary>Redimensiona a imagem para que sua resolução efetiva passe a ser <paramref name="targetDpi"/>, preservando o tamanho físico.</summary>
     RasterImage NormalizeDpi(RasterImage image, double targetDpi);
+
+    /// <summary>
+    /// Calcula o limiar global ótimo pelo método de Otsu (maximiza a variância entre classes do
+    /// histograma). Base do modo "Automático" de binarização (seção 89).
+    /// </summary>
+    byte ComputeOtsuThreshold(RasterImage grayscaleImage);
+
+    /// <summary>
+    /// Converte uma imagem em escala de cinza (<see cref="Enums.PixelFormat.Gray8"/>) para
+    /// preto e branco 1-bit (<see cref="Enums.PixelFormat.Bilevel1"/>) usando um único limiar
+    /// para toda a imagem. Passo central do pipeline TIFF documental (seção 23/85).
+    /// </summary>
+    RasterImage Binarize(RasterImage grayscaleImage, byte threshold);
+
+    /// <summary>
+    /// Converte para 1-bit usando um limiar calculado localmente (média de uma janela ao redor
+    /// de cada pixel — algoritmo de Bradley), mais robusto a iluminação irregular do que um
+    /// limiar único (seção 89, modo "Adaptativo").
+    /// </summary>
+    RasterImage BinarizeAdaptive(RasterImage grayscaleImage, int windowSize = 25, double sensitivity = 0.15);
 }

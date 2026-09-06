@@ -18,6 +18,7 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
 {
     private readonly IImageService _imageService;
     private readonly IImageExporter _imageExporter;
+    private readonly ITiffDocumentPipeline _tiffPipeline;
     private readonly IFilePickerService _filePicker;
     private readonly INotificationService _notifications;
 
@@ -45,11 +46,13 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
     public DocumentViewerViewModel(
         IImageService imageService,
         IImageExporter imageExporter,
+        ITiffDocumentPipeline tiffPipeline,
         IFilePickerService filePicker,
         INotificationService notifications)
     {
         _imageService = imageService;
         _imageExporter = imageExporter;
+        _tiffPipeline = tiffPipeline;
         _filePicker = filePicker;
         _notifications = notifications;
     }
@@ -145,6 +148,11 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         IsCropMode = false;
     }
 
+    // Seção 66: no menu de formato, mostrar "TIFF Documental (CCITT Group 4 — 200 DPI)" em vez
+    // de apenas "TIFF" — ajuda o usuário a escolher o formato certo sem precisar saber o que
+    // CCITT ou DPI significam.
+    private const string TiffDocumentalLabel = "TIFF Documental (CCITT Group 4 — 200 DPI)";
+
     [RelayCommand]
     private async Task SaveAsAsync()
     {
@@ -156,6 +164,7 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         var suggestedName = Path.GetFileNameWithoutExtension(DocumentTitle) is { Length: > 0 } n ? n : "Documento";
         var choices = new Dictionary<string, IList<string>>
         {
+            [TiffDocumentalLabel] = new List<string> { ".tif" },
             ["Imagem PNG"] = new List<string> { ".png" },
             ["Imagem JPG"] = new List<string> { ".jpg" },
         };
@@ -180,8 +189,16 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         IsBusy = true;
         try
         {
-            await _imageExporter.SaveAsync(_current, path);
-            _notifications.ShowSuccess("Documento salvo com sucesso.");
+            var extension = Path.GetExtension(path).ToLowerInvariant();
+            if (extension is ".tif" or ".tiff")
+            {
+                await SaveAsTiffDocumentalAsync(path);
+            }
+            else
+            {
+                await _imageExporter.SaveAsync(_current, path);
+                _notifications.ShowSuccess("Documento salvo com sucesso.");
+            }
         }
         catch (ScanovaException ex)
         {
@@ -195,5 +212,48 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    /// <summary>
+    /// Fluxo do marco funcional principal (seção 152): processa a imagem atual pelo pipeline
+    /// TIFF Documental, salva e valida automaticamente — o usuário só vê o resultado final
+    /// (seção 87/131), nunca os termos técnicos do processo.
+    /// </summary>
+    private async Task SaveAsTiffDocumentalAsync(string path)
+    {
+        if (_current is null)
+        {
+            return;
+        }
+
+        var result = await _tiffPipeline.SaveDocumentalTiffAsync(_current, path);
+
+        if (!result.Success)
+        {
+            _notifications.ShowError(result.UserMessage ?? "Não foi possível gerar o TIFF Documental.");
+            return;
+        }
+
+        // Seção 26/90: confirmação com o checklist de validação e a eficiência da compressão.
+        var sizeInfo = result is { OutputSizeBytes: { } outSize, OriginalSizeBytes: { } origSize } && origSize > 0
+            ? $" ({FormatBytes(origSize)} → {FormatBytes(outSize)})"
+            : string.Empty;
+
+        _notifications.ShowSuccess($"TIFF Documental salvo e validado: 200 DPI, 1 bit, CCITT Group 4{sizeInfo}.");
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        if (bytes >= 1024 * 1024)
+        {
+            return $"{bytes / (1024.0 * 1024.0):0.#} MB";
+        }
+
+        if (bytes >= 1024)
+        {
+            return $"{bytes / 1024.0:0.#} KB";
+        }
+
+        return $"{bytes} bytes";
     }
 }

@@ -5,6 +5,7 @@ using SCANOVA.App.ViewModels;
 using SCANOVA.Core.Interfaces;
 using SCANOVA.Imaging;
 using SCANOVA.Infrastructure;
+using SCANOVA.Tiff;
 using SCANOVA.Infrastructure.FileSystem;
 
 namespace SCANOVA.App;
@@ -33,6 +34,7 @@ public partial class App : Application
 
         services.AddScanovaInfrastructure();
         services.AddScanovaImaging();
+        services.AddScanovaTiff();
 
         services.AddSingleton<INavigationService, FrameNavigationService>();
         services.AddSingleton<INotificationService, NotificationService>();

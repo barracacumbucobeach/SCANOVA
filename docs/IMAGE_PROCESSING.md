@@ -1,7 +1,7 @@
 # Processamento de imagem
 
-> **Status:** Fase 2 concluída (`SCANOVA.Imaging` + fluxo de UI em `SCANOVA.App`); binarização e
-> melhoria automática completa chegam na Fase 3/5.
+> **Status:** Fase 2 e binarização (parte da Fase 3) concluídas; melhoria automática completa
+> (deskew, perspectiva, remoção de fundo/ruído) chega na Fase 5.
 
 ## SCANOVA.Imaging (Fase 2)
 
@@ -15,7 +15,8 @@ Implementado com SkiaSharp (MIT). Serviços:
 - `IImageService` (`SkiaImageService`) — rotação (ângulo arbitrário, com expansão de tela),
   espelhamento horizontal/vertical, corte por caixa delimitadora, conversão para escala de
   cinza (luminância Rec. 601), normalização de DPI (redimensionamento preservando o tamanho
-  físico).
+  físico, com formato de pixel original preservado — Gray8/Bilevel1 não "vazam" para RGBA), e
+  binarização (Otsu automático, global manual, adaptativo — ver `docs/TIFF.md`).
 
 `RasterImage` (em `SCANOVA.Core.Models`) é a representação de imagem independente de
 biblioteca usada em toda a aplicação — ver `docs/ARCHITECTURE.md`.
@@ -37,7 +38,10 @@ scanner, então nunca rodam diretamente na UI thread:
 `DocumentViewerPage` + `DocumentViewerViewModel`: abrir uma imagem (`Dashboard` → "Abrir
 documento", via `IFilePickerService`), visualizar com zoom (`ScrollViewer.ZoomMode`, botões
 "Ajustar à tela"/"1:1"), girar 90° para os dois lados, cortar por seleção manual (arrastar um
-retângulo sobre a imagem, "Aplicar corte"/"Cancelar corte") e exportar ("Salvar como" → PNG/JPG).
+retângulo sobre a imagem, "Aplicar corte"/"Cancelar corte") e exportar ("Salvar como" → **TIFF
+Documental (CCITT Group 4 — 200 DPI)** / PNG / JPG — seção 66). Escolher TIFF Documental aciona
+`ITiffDocumentPipeline` (ver `docs/TIFF.md`): processa, salva e valida automaticamente, sem o
+usuário precisar entender DPI/CCITT/binarização (seção 131) — o marco funcional da seção 152.
 Edição não destrutiva (seção 45): o arquivo original em disco só é tocado quando o usuário
 confirma "Salvar como".
 
@@ -47,6 +51,5 @@ a única camada com dependência de WinUI.
 
 ## Próximas fases
 
-- Fase 3: binarização (Otsu/adaptativa) e conversão para 1-bit, para o pipeline TIFF.
 - Fase 5: detecção de documento, correção de perspectiva, deskew, remoção de fundo/ruído,
   motor completo de melhoria automática (`IDocumentEnhancementService`).

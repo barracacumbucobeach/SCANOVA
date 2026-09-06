@@ -5,8 +5,12 @@ using CorePixelFormat = SCANOVA.Core.Enums.PixelFormat;
 
 namespace SCANOVA.Imaging.ImageProcessing;
 
-/// <summary>Implementação de <see cref="IImageService"/> usando SkiaSharp.</summary>
-public sealed class SkiaImageService : IImageService
+/// <summary>
+/// Implementação de <see cref="IImageService"/> usando SkiaSharp. Os métodos de binarização
+/// ficam em <c>Binarization/SkiaImageService.Binarization.cs</c> (mesma classe, arquivo
+/// separado) — são algoritmos puros sobre o buffer de pixels, sem dependência do SkiaSharp.
+/// </summary>
+public sealed partial class SkiaImageService : IImageService
 {
     public RasterImage Rotate(RasterImage image, int degrees)
     {
@@ -129,7 +133,19 @@ public sealed class SkiaImageService : IImageService
         }
 
         var result = SkiaConversions.ToRasterImage(resized, targetDpi, targetDpi);
-        return image.Format == CorePixelFormat.Gray8 ? ToGrayscale(result) : result;
+
+        // O redimensionamento sempre passa por RGBA (para usar filtragem de alta qualidade);
+        // restaura o formato de pixel original quando ele não é RGBA, para que NormalizeDpi
+        // nunca corrompa silenciosamente o formato de uma imagem em escala de cinza ou bilevel.
+        return image.Format switch
+        {
+            CorePixelFormat.Gray8 => ToGrayscale(result),
+            // Reamostra como cinza (com suavização) e rebinariza no ponto médio: melhor
+            // qualidade do que redimensionar o bitmap 1-bit diretamente teria (que produziria
+            // serrilhado sem essa etapa intermediária em escala de cinza).
+            CorePixelFormat.Bilevel1 => Binarize(ToGrayscale(result), 128),
+            _ => result,
+        };
     }
 
     private static RasterImage RenderTransformed(SKBitmap src, int width, int height, Action<SKCanvas> configureCanvas, double hDpi, double vDpi)

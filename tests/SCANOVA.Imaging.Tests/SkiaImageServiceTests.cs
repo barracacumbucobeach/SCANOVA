@@ -178,4 +178,34 @@ public class SkiaImageServiceTests
         var normalized = _sut.NormalizeDpi(image, image.HorizontalDpi);
         Assert.Same(image, normalized);
     }
+
+    [Fact]
+    public void NormalizeDpi_PreservesGray8Format()
+    {
+        var gray = _sut.ToGrayscale(TestImages.CreateDocumentLike(300, 200));
+
+        var normalized = _sut.NormalizeDpi(gray, 100);
+
+        Assert.Equal(CorePixelFormat.Gray8, normalized.Format);
+        Assert.Equal(150, normalized.Width);
+        Assert.Equal(100, normalized.Height);
+    }
+
+    [Fact]
+    public void NormalizeDpi_PreservesBilevel1Format()
+    {
+        // Regressão: NormalizeDpi redimensiona internamente via RGBA (para usar filtragem de
+        // alta qualidade) — sem tratamento especial, o resultado "vazava" como Rgba32 em vez de
+        // permanecer Bilevel1, o que quebraria silenciosamente o pipeline de TIFF Group 4
+        // (que exige a imagem já binarizada em Bilevel1 antes de codificar).
+        var gray = _sut.ToGrayscale(TestImages.CreateDocumentLike(300, 200));
+        var bilevel = _sut.Binarize(gray, _sut.ComputeOtsuThreshold(gray));
+
+        var normalized = _sut.NormalizeDpi(bilevel, 100);
+
+        Assert.Equal(CorePixelFormat.Bilevel1, normalized.Format);
+        Assert.Equal(150, normalized.Width);
+        Assert.Equal(100, normalized.Height);
+        Assert.Equal(RasterImage.MinimumStride(150, CorePixelFormat.Bilevel1), normalized.Stride);
+    }
 }
