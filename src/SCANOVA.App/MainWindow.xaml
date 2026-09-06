@@ -17,7 +17,7 @@
 
             <NavigationView.PaneHeader>
                 <StackPanel Orientation="Horizontal" Spacing="8" Margin="4,8,0,8" VerticalAlignment="Center">
-                    <Image Source="/Assets/scanova-icon.png" Width="28" Height="28" />
+                    <Image Source="/Assets/scanova-icon.png" Width="28" Height="28" AutomationProperties.AccessibilityView="Raw" />
                     <TextBlock Text="SCANOVA" Style="{ThemeResource BodyStrongTextBlockStyle}" VerticalAlignment="Center" />
                 </StackPanel>
             </NavigationView.PaneHeader>

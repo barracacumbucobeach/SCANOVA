@@ -30,19 +30,17 @@
                     BorderThickness="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     Visibility="{x:Bind ViewModel.HasDocument, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Image Source="{x:Bind ViewModel.PreviewBitmap, Mode=OneWay}" Stretch="Uniform" Margin="4" />
+                    <Image Source="{x:Bind ViewModel.PreviewBitmap, Mode=OneWay}" Stretch="Uniform" Margin="4" AutomationProperties.AccessibilityView="Raw" />
                 </Border>
 
                 <Button Content="Abrir documento" Command="{x:Bind ViewModel.OpenDocumentCommand}" HorizontalAlignment="Stretch" />
 
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Idioma do documento" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                    <ComboBox
-                        ItemsSource="{x:Bind ViewModel.Languages}"
-                        SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
-                        DisplayMemberPath="Label"
-                        HorizontalAlignment="Stretch" />
-                </StackPanel>
+                <ComboBox
+                    Header="Idioma do documento"
+                    ItemsSource="{x:Bind ViewModel.Languages}"
+                    SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
+                    DisplayMemberPath="Label"
+                    HorizontalAlignment="Stretch" />
 
                 <Button
                     Content="Reconhecer texto"

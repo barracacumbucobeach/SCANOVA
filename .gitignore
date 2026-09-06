@@ -2,8 +2,15 @@
 bin/
 obj/
 publish/
-installer/
 artifacts/
+
+# Saída gerada pelo instalador (Fase 11) — o código-fonte do projeto (installer/*.wixproj,
+# *.wxs, *.ps1) É versionado; só os artefatos que ele produz não são.
+installer/**/bin/
+installer/**/obj/
+installer/**/*.msi
+installer/**/*.wixpdb
+installer/**/*.sha256
 
 # Visual Studio / Rider
 .vs/

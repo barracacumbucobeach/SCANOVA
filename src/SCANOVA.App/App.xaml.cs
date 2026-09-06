@@ -49,6 +49,7 @@ public partial class App : Application
         services.AddSingleton<INavigationService, FrameNavigationService>();
         services.AddSingleton<INotificationService, NotificationService>();
         services.AddSingleton<IFilePickerService, FilePickerService>();
+        services.AddSingleton<IThemeService, ThemeService>();
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<DocumentViewerViewModel>();
@@ -79,6 +80,11 @@ public partial class App : Application
             tempFiles.CleanupCurrentSession();
             log.Info("SCANOVA encerrado.");
         };
+
+        // Fase 11 (modo escuro): aplica a preferência salva antes de mostrar a janela, para
+        // nunca exibir um "flash" no tema errado.
+        Services.GetRequiredService<IThemeService>().Apply(settingsService.Current.Theme);
+
         MainAppWindow.Activate();
     }
 

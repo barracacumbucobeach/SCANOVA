@@ -1,0 +1,44 @@
+<Project Sdk="WixToolset.Sdk/4.0.6">
+
+  <!--
+    Instalador tradicional (MSI, seção 91/118) — NÃO é MSIX: assim o SCANOVA pode ser distribuído
+    diretamente pelo fabricante (site próprio, e-mail, etc.), sem depender da Microsoft Store nem
+    de um certificado de assinatura de pacote MSIX. Instala por usuário (Scope="perUser" em
+    Product.wxs) — sem exigir privilégios de administrador, mesmo princípio de
+    app.manifest (asInvoker) já usado pelo próprio SCANOVA.App.
+
+    IMPORTANTE — limitação conhecida deste ambiente: o WiX Toolset só roda no Windows (confirmado
+    ao tentar `wix build` neste ambiente Linux: falha com "The WiX Toolset only supports
+    Windows"). Este projeto foi escrito com cuidado a partir da documentação oficial do WiX v4,
+    mas NUNCA foi de fato compilado nem testado neste ambiente — precisa de uma primeira
+    verificação em uma máquina Windows antes de confiar nele para gerar um instalador real (ver
+    docs/BUILD.md e docs/LICENSING.md... digo, docs/ARCHITECTURE.md). Mesmo espírito da limitação
+    já documentada para SCANOVA.App (compilador XAML nativo do Windows).
+
+    Pré-requisito: publicar SCANOVA.App antes de compilar este projeto —
+    dotnet publish ..\..\src\SCANOVA.App -c Release -p:PublishProfile=win-x64
+    (ver installer/Build-Installer.ps1, que faz os dois passos em sequência).
+  -->
+
+  <PropertyGroup>
+    <OutputName>SCANOVA-Setup</OutputName>
+    <OutputType>Package</OutputType>
+    <Platform>x64</Platform>
+
+    <!-- Pasta publicada de SCANOVA.App (gerada por `dotnet publish`, ver o comentário acima) —
+         pode ser sobrescrita na linha de comando: `dotnet build -p:AppPublishDir=...`. -->
+    <AppPublishDir Condition="'$(AppPublishDir)' == ''">..\..\src\SCANOVA.App\bin\publish\win-x64\</AppPublishDir>
+
+    <!-- Versão do instalador — mantida sincronizada manualmente com a versão do produto
+         (seção 118). Formato exigido pelo MSI: major.minor.build (sem o 4º componente). -->
+    <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0</ProductVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <HarvestDirectory Include="$(AppPublishDir)">
+      <ComponentGroupName>AppFilesComponentGroup</ComponentGroupName>
+      <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
+    </HarvestDirectory>
+  </ItemGroup>
+
+</Project>

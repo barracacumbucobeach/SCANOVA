@@ -11,6 +11,18 @@
 
             <TextBlock Text="Configurações" Style="{ThemeResource TitleLargeTextBlockStyle}" />
 
+            <!-- Fase 11: aparência (modo claro/escuro/padrão do sistema) — aplicada imediatamente, sem precisar reiniciar. -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Aparência" Style="{ThemeResource SubtitleTextBlockStyle}" />
+                <ComboBox
+                    Header="Tema"
+                    ItemsSource="{x:Bind ViewModel.ThemeOptions}"
+                    SelectedItem="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}"
+                    DisplayMemberPath="Label"
+                    HorizontalAlignment="Left"
+                    MinWidth="220" />
+            </StackPanel>
+
             <!-- Fase 10: licença vitalícia — ativação por chave, sem servidor, sem mensalidade. -->
             <StackPanel Spacing="12">
                 <TextBlock Text="Licença" Style="{ThemeResource SubtitleTextBlockStyle}" />

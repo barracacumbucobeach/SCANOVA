@@ -6,9 +6,12 @@
     NÃO compila em Linux/macOS: os pacotes de referência do Windows SDK e o compilador XAML
     exigem o SDK do Windows. Ver docs/BUILD.md.
 
-    Modelo de implantação: "Unpackaged" (WindowsPackageType=None) nesta fase — evita exigir
-    um Package.appxmanifest com ícones MSIX antes de termos os assets de marca definitivos.
-    O empacotamento MSIX/instalador será tratado na Fase 11 (seção 91).
+    Modelo de implantação: "Unpackaged" (WindowsPackageType=None) — decisão final da Fase 11
+    (seção 91): o instalador é um MSI tradicional (WiX, ver installer/), não MSIX, para o
+    SCANOVA poder ser distribuído diretamente pelo fabricante (site próprio, e-mail) sem
+    depender da Microsoft Store nem de um certificado de assinatura de pacote MSIX — o mesmo
+    raciocínio "sem depender de infraestrutura de terceiros" já aplicado ao licenciamento
+    (Fase 10, seção 146: licença vitalícia sem servidor de ativação).
   -->
 
   <PropertyGroup>

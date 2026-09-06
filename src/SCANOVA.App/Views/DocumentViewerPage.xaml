@@ -107,7 +107,7 @@
                 PointerReleased="ImageHost_PointerReleased"
                 PointerCanceled="ImageHost_PointerReleased">
 
-                <Image x:Name="MainImage" Source="{x:Bind ViewModel.DisplayBitmap, Mode=OneWay}" Stretch="None" />
+                <Image x:Name="MainImage" Source="{x:Bind ViewModel.DisplayBitmap, Mode=OneWay}" Stretch="None" AutomationProperties.Name="{x:Bind ViewModel.DocumentTitle, Mode=OneWay}" />
 
                 <Canvas x:Name="CropCanvas" IsHitTestVisible="False">
                     <Rectangle

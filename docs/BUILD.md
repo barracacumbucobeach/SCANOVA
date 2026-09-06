@@ -52,8 +52,8 @@ Ou abra `SCANOVA.sln` no Visual Studio 2022 e compile normalmente (F6/Ctrl+Shift
 
 - **Debug**: símbolos completos, sem otimizações — uso durante o desenvolvimento.
 - **Release**: build otimizado, usado para gerar os artefatos de publicação/instalador
-  (seção 118 da especificação). A geração do instalador (MSIX/instalador tradicional +
-  checksum) será formalizada na Fase 11.
+  (seção 118 da especificação). Ver `docs/INSTALLER.md` para gerar o instalador (MSI + checksum,
+  via `installer\Build-Installer.ps1` — só no Windows).
 
 ## Executar apenas os testes de uma camada
 

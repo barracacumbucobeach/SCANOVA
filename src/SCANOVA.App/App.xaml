@@ -15,18 +15,34 @@
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
             <converters:BoolToInfoBarSeverityConverter x:Key="BoolToInfoBarSeverityConverter" />
 
-            <!-- Cor de marca principal do SCANOVA (seção 8: cor principal + tons neutros + estados semânticos). -->
-            <Color x:Key="ScanovaBrandColor">#1F4FD8</Color>
-            <SolidColorBrush x:Key="ScanovaBrandBrush" Color="{StaticResource ScanovaBrandColor}" />
+            <!--
+                Cores de marca do SCANOVA (seção 8: cor principal + tons neutros + estados
+                semânticos) — seguem o tema ativo (Fase 11, modo escuro): os tons de cada cor no
+                modo escuro são versões mais claras/saturadas das do modo claro, para manter
+                contraste suficiente contra um fundo escuro (a mesma cor "crua" do modo claro
+                perde legibilidade em cima de um fundo quase preto). Chaves iguais nas duas
+                seções — todo o resto do aplicativo referencia só {ThemeResource ScanovaXBrush},
+                nunca a cor diretamente, então nenhuma página precisa saber que isso existe.
+            -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <Color x:Key="ScanovaBrandColor">#1F4FD8</Color>
+                    <Color x:Key="ScanovaSuccessColor">#1E8E3E</Color>
+                    <Color x:Key="ScanovaWarningColor">#B45309</Color>
+                    <Color x:Key="ScanovaErrorColor">#C4281C</Color>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <Color x:Key="ScanovaBrandColor">#6C93FF</Color>
+                    <Color x:Key="ScanovaSuccessColor">#4ECB78</Color>
+                    <Color x:Key="ScanovaWarningColor">#F2A65A</Color>
+                    <Color x:Key="ScanovaErrorColor">#FF6B5D</Color>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
 
-            <Color x:Key="ScanovaSuccessColor">#1E8E3E</Color>
-            <SolidColorBrush x:Key="ScanovaSuccessBrush" Color="{StaticResource ScanovaSuccessColor}" />
-
-            <Color x:Key="ScanovaWarningColor">#B45309</Color>
-            <SolidColorBrush x:Key="ScanovaWarningBrush" Color="{StaticResource ScanovaWarningColor}" />
-
-            <Color x:Key="ScanovaErrorColor">#C4281C</Color>
-            <SolidColorBrush x:Key="ScanovaErrorBrush" Color="{StaticResource ScanovaErrorColor}" />
+            <SolidColorBrush x:Key="ScanovaBrandBrush" Color="{ThemeResource ScanovaBrandColor}" />
+            <SolidColorBrush x:Key="ScanovaSuccessBrush" Color="{ThemeResource ScanovaSuccessColor}" />
+            <SolidColorBrush x:Key="ScanovaWarningBrush" Color="{ThemeResource ScanovaWarningColor}" />
+            <SolidColorBrush x:Key="ScanovaErrorBrush" Color="{ThemeResource ScanovaErrorColor}" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

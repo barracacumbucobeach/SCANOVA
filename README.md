@@ -73,7 +73,20 @@ atual:
       máquina. Lista de revogação embutida (atualizada a cada versão), também consultada
       offline. Nova tela "Configurações" (item "Configurações" do menu lateral, antes um
       placeholder): status da licença, ativação por chave, desativação.
-- [ ] Fase 11 — Polimento e instalador
+- [x] **Fase 11 — Polimento e instalador**: modo escuro via o mecanismo nativo de temas do
+      WinUI 3 (`ResourceDictionary.ThemeDictionaries`) — as 4 cores de marca customizadas
+      ganharam variantes para o tema escuro; seletor de aparência (Sistema/Claro/Escuro) na tela
+      "Configurações", aplicado imediatamente (`IThemeService`), sem reiniciar. Acessibilidade:
+      auditoria e correção de rótulos de campo (`ComboBox.Header` em vez de texto solto ao lado),
+      nomes de acessibilidade explícitos nos cartões do Início, ícones/imagens puramente
+      decorativos ocultados da árvore de acessibilidade (ver `docs/ACCESSIBILITY.md` para a
+      lista completa e a limitação conhecida do recorte manual, só por mouse). Performance:
+      revisão de código confirmando que nenhum trabalho pesado roda na UI thread (ver
+      `docs/PERFORMANCE.md`). Testes: auditoria de cobertura fechou um gap real
+      (`ExportSettingsTests`, novo). Instalador: MSI tradicional via WiX Toolset (não MSIX —
+      permite venda direta pelo fabricante sem depender da Microsoft Store), com atualização
+      automática e checksum SHA-256 (`installer/`, ver `docs/INSTALLER.md` — projeto escrito e
+      documentado, mas ainda sem uma primeira compilação real, possível só no Windows).
 
 ## Estrutura
 
@@ -97,8 +110,12 @@ tools/
 └── SCANOVA.LicenseTool/         — ferramenta do FABRICANTE (gera chaves, emite licenças) —
                                    nunca é distribuída com o aplicativo, ver docs/LICENSING.md
 
+installer/
+└── SCANOVA.Installer/           — instalador MSI (WiX Toolset), ver docs/INSTALLER.md
+
 tests/                          — um projeto de teste por camada + testes de integração
-docs/                            — documentação técnica (arquitetura, TIFF, scanner, OCR, PDF, licenciamento, build, testes)
+docs/                            — documentação técnica (arquitetura, TIFF, scanner, OCR, PDF,
+                                   licenciamento, acessibilidade, performance, instalador, build, testes)
 ```
 
 ## Por que a UI não compila neste ambiente

@@ -44,10 +44,24 @@ nativo do Windows — não há build nativo para Linux/macOS. Por isso:
 
 ## Modelo de implantação da UI
 
-`SCANOVA.App` usa o modelo **"Unpackaged"** (`WindowsPackageType=None`) nesta fase — evita exigir
-um `Package.appxmanifest` com ícones MSIX definitivos antes de termos os assets de marca finais.
-O empacotamento (MSIX e/ou instalador tradicional) será definido na Fase 11 (seção 91 da
-especificação), quando também trocaremos para o modelo empacotado, se for a opção escolhida.
+`SCANOVA.App` usa o modelo **"Unpackaged"** (`WindowsPackageType=None`) — decisão final da Fase
+11 (seção 91): o instalador é um MSI tradicional (WiX Toolset, ver `docs/INSTALLER.md`), não
+MSIX, para o SCANOVA poder ser distribuído diretamente pelo fabricante sem depender da Microsoft
+Store nem de um certificado de assinatura de pacote MSIX.
+
+## Polimento (Fase 11)
+
+Três frentes documentadas em separado, por serem tópicos autocontidos: `docs/ACCESSIBILITY.md`
+(auditoria de rotulagem/semântica sobre as telas já existentes), `docs/PERFORMANCE.md` (revisão
+de código — este ambiente não consegue rodar o aplicativo de verdade para medir performance) e
+`docs/INSTALLER.md` (instalador MSI). O modo escuro (seção 48) usa o mecanismo nativo de temas do
+WinUI 3 (`ThemeResource`/`ResourceDictionary.ThemeDictionaries`): como toda a UI, desde a Fase 1,
+já usava recursos de tema em vez de cores fixas, o único ajuste necessário foi tornar as 4 cores
+de marca customizadas (`ScanovaBrandColor` e as três cores de estado semântico) sensíveis ao
+tema — variantes mais claras no modo escuro, para manter contraste contra um fundo escuro. Um
+seletor de aparência (Sistema/Claro/Escuro) na tela "Configurações" aplica a preferência
+imediatamente, sem reiniciar (`IThemeService`), e a persiste via `AppSettings.Theme` (já
+existente desde a Fase 1).
 
 ## Injeção de dependência
 

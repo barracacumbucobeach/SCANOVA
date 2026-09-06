@@ -14,7 +14,7 @@
             VerticalAlignment="Center"
             Spacing="12"
             MaxWidth="420">
-            <FontIcon Glyph="&#xE8B9;" FontSize="32" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <FontIcon Glyph="&#xE8B9;" FontSize="32" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" AutomationProperties.AccessibilityView="Raw" />
             <TextBlock Text="Nenhum scanner foi encontrado." Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" TextAlignment="Center" />
             <TextBlock
                 Text="Verifique se o scanner está conectado e instalado no Windows."
@@ -35,28 +35,24 @@
 
             <TextBlock Text="Digitalizar" Style="{ThemeResource TitleLargeTextBlockStyle}" />
 
-            <StackPanel Spacing="6">
-                <TextBlock Text="Scanner" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                <ComboBox
-                    ItemsSource="{x:Bind ViewModel.Scanners}"
-                    SelectedItem="{x:Bind ViewModel.SelectedScanner, Mode=TwoWay}"
-                    DisplayMemberPath="Name"
-                    HorizontalAlignment="Stretch"
-                    IsEnabled="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}" />
-            </StackPanel>
+            <ComboBox
+                Header="Scanner"
+                ItemsSource="{x:Bind ViewModel.Scanners}"
+                SelectedItem="{x:Bind ViewModel.SelectedScanner, Mode=TwoWay}"
+                DisplayMemberPath="Name"
+                HorizontalAlignment="Stretch"
+                IsEnabled="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}" />
+
+            <ComboBox
+                Header="Origem"
+                ItemsSource="{x:Bind ViewModel.Sources}"
+                SelectedItem="{x:Bind ViewModel.SelectedSource, Mode=TwoWay}"
+                DisplayMemberPath="Label"
+                HorizontalAlignment="Stretch" />
 
             <StackPanel Spacing="6">
-                <TextBlock Text="Origem" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                 <ComboBox
-                    ItemsSource="{x:Bind ViewModel.Sources}"
-                    SelectedItem="{x:Bind ViewModel.SelectedSource, Mode=TwoWay}"
-                    DisplayMemberPath="Label"
-                    HorizontalAlignment="Stretch" />
-            </StackPanel>
-
-            <StackPanel Spacing="6">
-                <TextBlock Text="Perfil" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                <ComboBox
+                    Header="Perfil"
                     ItemsSource="{x:Bind ViewModel.Profiles}"
                     SelectedItem="{x:Bind ViewModel.SelectedProfile, Mode=TwoWay}"
                     DisplayMemberPath="Name"

@@ -12,7 +12,7 @@
             VerticalAlignment="Center"
             Spacing="12"
             MaxWidth="480">
-            <FontIcon Glyph="&#xE90F;" FontSize="32" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <FontIcon Glyph="&#xE90F;" FontSize="32" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" AutomationProperties.AccessibilityView="Raw" />
             <TextBlock x:Name="TitleText" Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock
                 x:Name="DescriptionText"

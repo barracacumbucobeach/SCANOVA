@@ -9,7 +9,7 @@
     <ScrollViewer Padding="32,24,32,24">
         <StackPanel Spacing="24" MaxWidth="960" HorizontalAlignment="Left">
 
-            <Image Source="/Assets/scanova-logo.png" Width="220" Stretch="Uniform" HorizontalAlignment="Left" />
+            <Image Source="/Assets/scanova-logo.png" Width="220" Stretch="Uniform" HorizontalAlignment="Left" AutomationProperties.AccessibilityView="Raw" />
 
             <!-- Seção 133: introdução curta de primeiro uso, dispensável, não bloqueante. -->
             <InfoBar
@@ -37,49 +37,61 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ScanDocumentCommand}">
+                <Button
+                    Grid.Row="0" Grid.Column="0" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ScanDocumentCommand}"
+                    AutomationProperties.Name="Digitalizar documento. Digitalize usando um scanner instalado.">
                     <StackPanel Spacing="8">
-                        <FontIcon Glyph="&#xE8B9;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <FontIcon Glyph="&#xE8B9;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" AutomationProperties.AccessibilityView="Raw" />
                         <TextBlock Text="Digitalizar documento" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         <TextBlock Text="Digitalize usando um scanner instalado." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.OpenDocumentCommand}">
+                <Button
+                    Grid.Row="0" Grid.Column="1" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.OpenDocumentCommand}"
+                    AutomationProperties.Name="Abrir documento. Abra uma imagem ou PDF.">
                     <StackPanel Spacing="8">
-                        <FontIcon Glyph="&#xE8E5;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <FontIcon Glyph="&#xE8E5;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" AutomationProperties.AccessibilityView="Raw" />
                         <TextBlock Text="Abrir documento" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         <TextBlock Text="Abra uma imagem ou PDF." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ConvertCommand}">
+                <Button
+                    Grid.Row="0" Grid.Column="2" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ConvertCommand}"
+                    AutomationProperties.Name="Converter. Converta documentos entre formatos.">
                     <StackPanel Spacing="8">
-                        <FontIcon Glyph="&#xE895;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <FontIcon Glyph="&#xE895;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" AutomationProperties.AccessibilityView="Raw" />
                         <TextBlock Text="Converter" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         <TextBlock Text="Converta documentos entre formatos." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ComposeDuplexCommand}">
+                <Button
+                    Grid.Row="1" Grid.Column="0" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ComposeDuplexCommand}"
+                    AutomationProperties.Name="Frente e verso. Combine frente e verso em um único documento.">
                     <StackPanel Spacing="8">
-                        <FontIcon Glyph="&#xE8F1;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <FontIcon Glyph="&#xE8F1;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" AutomationProperties.AccessibilityView="Raw" />
                         <TextBlock Text="Frente + verso" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         <TextBlock Text="Combine frente e verso em um único documento." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.EnhanceDocumentCommand}">
+                <Button
+                    Grid.Row="1" Grid.Column="1" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.EnhanceDocumentCommand}"
+                    AutomationProperties.Name="Melhorar documento. Corrija contraste, fundo, nitidez, inclinação e legibilidade.">
                     <StackPanel Spacing="8">
-                        <FontIcon Glyph="&#xE7B3;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <FontIcon Glyph="&#xE7B3;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" AutomationProperties.AccessibilityView="Raw" />
                         <TextBlock Text="Melhorar documento" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         <TextBlock Text="Corrija contraste, fundo, nitidez, inclinação e legibilidade." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ExtractTextCommand}">
+                <Button
+                    Grid.Row="1" Grid.Column="2" Style="{StaticResource ScanovaActionCardStyle}" Command="{x:Bind ViewModel.ExtractTextCommand}"
+                    AutomationProperties.Name="Extrair texto. Reconheça o texto de uma imagem ou PDF.">
                     <StackPanel Spacing="8">
-                        <FontIcon Glyph="&#xE8D2;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" />
+                        <FontIcon Glyph="&#xE8D2;" FontSize="24" Foreground="{ThemeResource ScanovaBrandBrush}" AutomationProperties.AccessibilityView="Raw" />
                         <TextBlock Text="Extrair texto" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                         <TextBlock Text="Reconheça o texto de uma imagem ou PDF." TextWrapping="Wrap" Style="{ThemeResource CaptionTextBlockStyle}" />
                     </StackPanel>

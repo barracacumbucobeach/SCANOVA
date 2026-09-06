@@ -35,8 +35,8 @@
             </StackPanel>
 
             <StackPanel Spacing="8" IsEnabled="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
-                <TextBlock Text="Formato de saída" Style="{ThemeResource BodyStrongTextBlockStyle}" />
                 <ComboBox
+                    Header="Formato de saída"
                     ItemsSource="{x:Bind ViewModel.Formats}"
                     SelectedItem="{x:Bind ViewModel.SelectedFormat, Mode=TwoWay}"
                     DisplayMemberPath="Label"

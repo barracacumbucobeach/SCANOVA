@@ -8,16 +8,30 @@ using SCANOVA.Core.Models;
 
 namespace SCANOVA.App.ViewModels;
 
+/// <summary>Item de aparência exibido no seletor de tema (Fase 11 — modo escuro).</summary>
+public sealed record ThemeOption(string Label, string Value);
+
 /// <summary>
-/// ViewModel da tela "Configurações" (seção 48) — nesta fase, principalmente a seção de
-/// licenciamento (Fase 10): status da licença, ativação por chave, e desativação. Uma seção
-/// "Sobre" simples também fica aqui, por ser um complemento natural e barato de adicionar junto.
-/// As demais seções de configurações (aparência, acessibilidade etc.) ficam para a Fase 11.
+/// ViewModel da tela "Configurações" (seção 48): aparência (Fase 11 — modo escuro/claro/padrão
+/// do sistema), licenciamento (Fase 10 — status da licença, ativação por chave, desativação) e
+/// uma seção "Sobre" simples.
 /// </summary>
 public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly ILicenseService _licenseService;
+    private readonly ISettingsService _settings;
+    private readonly IThemeService _themeService;
     private readonly INotificationService _notifications;
+
+    public IReadOnlyList<ThemeOption> ThemeOptions { get; } =
+    [
+        new("Padrão do sistema", "System"),
+        new("Claro", "Light"),
+        new("Escuro", "Dark"),
+    ];
+
+    [ObservableProperty]
+    private ThemeOption selectedTheme;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StatusText))]
@@ -66,11 +80,32 @@ public sealed partial class SettingsViewModel : ObservableObject
         }
     }
 
-    public SettingsViewModel(ILicenseService licenseService, INotificationService notifications)
+    public SettingsViewModel(ILicenseService licenseService, ISettingsService settings, IThemeService themeService, INotificationService notifications)
     {
         _licenseService = licenseService;
+        _settings = settings;
+        _themeService = themeService;
         _notifications = notifications;
+        selectedTheme = ThemeOptions.FirstOrDefault(o => o.Value == _settings.Current.Theme) ?? ThemeOptions[0];
         Refresh();
+    }
+
+    partial void OnSelectedThemeChanged(ThemeOption value)
+    {
+        _themeService.Apply(value.Value);
+        _ = SaveThemePreferenceAsync(value.Value);
+    }
+
+    private async Task SaveThemePreferenceAsync(string theme)
+    {
+        try
+        {
+            await _settings.SaveAsync(_settings.Current with { Theme = theme });
+        }
+        catch (Exception)
+        {
+            _notifications.ShowError("Não foi possível salvar a preferência de aparência.");
+        }
     }
 
     private void Refresh()
