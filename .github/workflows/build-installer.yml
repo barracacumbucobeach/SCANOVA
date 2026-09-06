@@ -1,0 +1,57 @@
+name: Build Installer
+
+# Constrói o SCANOVA.App e o instalador (MSI) em um runner Windows de verdade — necessário
+# porque nem o compilador XAML do Windows App SDK nem o WiX Toolset rodam em Linux/macOS (ver
+# docs/BUILD.md e docs/INSTALLER.md). Só roda quando disparado manualmente (workflow_dispatch),
+# nunca a cada push, para não consumir minutos de Actions sem necessidade.
+on:
+  workflow_dispatch:
+    inputs:
+      product_version:
+        description: "Versão do instalador (major.minor.build)"
+        required: false
+        default: "1.0.0"
+
+jobs:
+  build-installer:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publicar SCANOVA.App (win-x64, autocontido)
+        run: dotnet publish src/SCANOVA.App -c Release -p:PublishProfile=win-x64
+
+      - name: Compilar o instalador (WiX)
+        shell: pwsh
+        run: |
+          $publishDir = Join-Path $env:GITHUB_WORKSPACE "src\SCANOVA.App\bin\publish\win-x64\"
+          dotnet build installer/SCANOVA.Installer/SCANOVA.Installer.wixproj -c Release `
+            -p:AppPublishDir="$publishDir" `
+            -p:ProductVersion="${{ github.event.inputs.product_version }}"
+
+      - name: Gerar checksum e preparar artefato
+        shell: pwsh
+        run: |
+          $msi = Get-ChildItem -Path "installer/SCANOVA.Installer" -Filter "SCANOVA-Setup.msi" -Recurse |
+              Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $msi) { throw "SCANOVA-Setup.msi não foi encontrado depois do build." }
+
+          $hash = Get-FileHash -Path $msi.FullName -Algorithm SHA256
+          $checksumLine = "$($hash.Hash.ToLowerInvariant())  SCANOVA-Setup.msi"
+
+          New-Item -ItemType Directory -Force -Path "dist" | Out-Null
+          Copy-Item $msi.FullName "dist/SCANOVA-Setup.msi"
+          $checksumLine | Out-File -FilePath "dist/SCANOVA-Setup.msi.sha256" -Encoding ascii -NoNewline
+
+      - name: Publicar artefato do instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: SCANOVA-Setup
+          path: dist/
+          if-no-files-found: error

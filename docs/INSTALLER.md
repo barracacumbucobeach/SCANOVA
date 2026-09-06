@@ -44,7 +44,15 @@ installer/
   arquivos automaticamente (`MajorUpgrade` em `Product.wxs`); a instalação de uma versão mais
   antiga sobre uma mais nova é bloqueada com uma mensagem clara.
 
-## Como gerar o instalador (só no Windows)
+## Como gerar o instalador sem precisar de uma máquina Windows própria
+
+`.github/workflows/build-installer.yml` builda o instalador em um runner **Windows de verdade**
+do GitHub Actions — útil porque nem o compilador XAML do Windows App SDK nem o WiX Toolset rodam
+fora do Windows. Disparo manual (aba "Actions" do repositório → "Build Installer" → "Run
+workflow"); o `SCANOVA-Setup.msi` + `SCANOVA-Setup.msi.sha256` ficam disponíveis como artefato do
+run ao final (uns 5-10 minutos). Só roda quando disparado manualmente, nunca a cada push.
+
+## Como gerar o instalador (numa máquina Windows própria)
 
 ```powershell
 .\installer\Build-Installer.ps1 -ProductVersion 1.0.0
