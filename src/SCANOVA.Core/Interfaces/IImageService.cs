@@ -8,7 +8,8 @@ namespace SCANOVA.Core.Interfaces;
 /// </summary>
 public interface IImageService
 {
-    RasterImage Rotate(RasterImage image, int degrees);
+    /// <summary>Gira a imagem por um ângulo arbitrário (não limitado a múltiplos de 90°), expandindo a tela para caber o resultado.</summary>
+    RasterImage Rotate(RasterImage image, double degrees);
 
     RasterImage FlipHorizontal(RasterImage image);
 
@@ -45,4 +46,38 @@ public interface IImageService
     /// limiar único (seção 89, modo "Adaptativo").
     /// </summary>
     RasterImage BinarizeAdaptive(RasterImage grayscaleImage, int windowSize = 25, double sensitivity = 0.15);
+
+    /// <summary>
+    /// Corrige a perspectiva de um quadrilátero (possivelmente não retangular, por foto/scan
+    /// inclinado) para um retângulo alinhado aos eixos com as dimensões informadas, via
+    /// transformação projetiva (homografia) — seção 17.
+    /// </summary>
+    RasterImage CorrectPerspective(RasterImage image, CropRegion quad, int outputWidth, int outputHeight);
+
+    /// <summary>Ajusta brilho (-100..100) e contraste (-100..100) de forma linear. 0/0 = sem alteração.</summary>
+    RasterImage AdjustBrightnessContrast(RasterImage image, int brightness, int contrast);
+
+    /// <summary>Aplica correção de gamma. 1.0 = sem alteração; menor que 1 escurece, maior que 1 clareia os tons médios.</summary>
+    RasterImage AdjustGamma(RasterImage image, double gamma);
+
+    /// <summary>Aumenta nitidez via máscara de nitidez (unsharp mask). 0 = sem alteração.</summary>
+    RasterImage Sharpen(RasterImage image, double amount);
+
+    /// <summary>Reduz ruído por suavização leve (filtro de média), preservando bordas o quanto possível.</summary>
+    RasterImage ReduceNoise(RasterImage image, int radius = 1);
+
+    /// <summary>
+    /// Normaliza iluminação/fundo irregular (ex.: sombra de foto de celular): estima o fundo por
+    /// desfoque de grande raio e o remove, preservando texto/tinta em primeiro plano (seção 19/20).
+    /// Requer uma imagem em escala de cinza.
+    /// </summary>
+    RasterImage RemoveBackground(RasterImage grayscaleImage, int blurRadius = 15);
+
+    /// <summary>
+    /// Ajusta a saturação de cor (-100..100; 0 = sem alteração; -100 = tons de cinza; 100 =
+    /// saturação dobrada), interpolando cada canal em direção à sua luminância. Sem efeito em
+    /// imagens que já não estão em modo colorido (<see cref="Enums.PixelFormat.Gray8"/>/
+    /// <see cref="Enums.PixelFormat.Bilevel1"/>) — retorna a imagem original nesse caso.
+    /// </summary>
+    RasterImage AdjustSaturation(RasterImage image, int saturation);
 }

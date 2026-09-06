@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SCANOVA.Core.Interfaces;
+using SCANOVA.Imaging.Detection;
+using SCANOVA.Imaging.Enhancement;
 using SCANOVA.Imaging.ImageLoading;
 using SCANOVA.Imaging.ImageProcessing;
 
@@ -13,6 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IImageLoader, SkiaImageLoader>();
         services.AddSingleton<IImageExporter, SkiaImageExporter>();
         services.AddSingleton<IImageService, SkiaImageService>();
+        services.AddSingleton<IDocumentDetectionService, DocumentDetectionService>();
+        services.AddSingleton<IDocumentEnhancementService, DocumentEnhancementService>();
         return services;
     }
 }

@@ -102,9 +102,14 @@ public sealed partial class DashboardViewModel : ObservableObject
     private void ComposeDuplex() =>
         _navigation.NavigateToPlaceholder("Frente + verso", "A composição frente e verso será implementada na Fase 7.");
 
+    /// <summary>
+    /// "Melhorar documento" (seção 20): abre um documento existente diretamente no visualizador,
+    /// onde "Melhorar automaticamente" (Fase 5) fica disponível — mesmo fluxo de abertura de
+    /// <see cref="OpenDocumentAsync"/>, já que melhorar é uma ação sobre um documento aberto, não
+    /// uma tela separada.
+    /// </summary>
     [RelayCommand]
-    private void EnhanceDocument() =>
-        _navigation.NavigateToPlaceholder("Melhorar documento", "O motor de melhoria automática será implementado na Fase 5 (Automação).");
+    private async Task EnhanceDocumentAsync() => await OpenDocumentAsync();
 
     [RelayCommand]
     private void ExtractText() =>

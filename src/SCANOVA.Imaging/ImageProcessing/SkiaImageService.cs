@@ -12,7 +12,7 @@ namespace SCANOVA.Imaging.ImageProcessing;
 /// </summary>
 public sealed partial class SkiaImageService : IImageService
 {
-    public RasterImage Rotate(RasterImage image, int degrees)
+    public RasterImage Rotate(RasterImage image, double degrees)
     {
         var normalized = ((degrees % 360) + 360) % 360;
         if (normalized == 0)
@@ -31,7 +31,7 @@ public sealed partial class SkiaImageService : IImageService
         return RenderTransformed(src, newWidth, newHeight, canvas =>
         {
             canvas.Translate(newWidth / 2f, newHeight / 2f);
-            canvas.RotateDegrees(normalized);
+            canvas.RotateDegrees((float)normalized);
             canvas.Translate(-image.Width / 2f, -image.Height / 2f);
         }, image.HorizontalDpi, image.VerticalDpi);
     }

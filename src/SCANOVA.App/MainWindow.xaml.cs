@@ -111,7 +111,7 @@ public sealed partial class MainWindow : Window
                 navigation.NavigateToPlaceholder("Compor", "A composição frente + verso será implementada na Fase 7.");
                 break;
             case "Enhance":
-                navigation.NavigateToPlaceholder("Melhorar", "O motor de melhoria automática de documentos será implementado na Fase 5 (Automação).");
+                navigation.NavigateToPlaceholder("Melhorar", "Use o cartão \"Melhorar documento\" no Início para abrir um documento e melhorá-lo automaticamente (endireitar, corrigir perspectiva, remover fundo/ruído e ajustar tom).");
                 break;
             case "Ocr":
                 navigation.NavigateToPlaceholder("OCR", "O reconhecimento de texto local será implementado na Fase 9 (OCR).");

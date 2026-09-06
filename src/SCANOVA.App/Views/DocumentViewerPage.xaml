@@ -54,6 +54,19 @@
 
             <AppBarSeparator />
 
+            <AppBarButton Label="Melhorar automaticamente" Command="{x:Bind ViewModel.EnhanceAutomaticallyCommand}">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE945;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Label="Reverter para original" Command="{x:Bind ViewModel.RevertToOriginalCommand}">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE7A7;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+
+            <AppBarSeparator />
+
             <AppBarButton Label="Ajustar à tela" Click="FitToScreen_Click">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xE9A6;" />

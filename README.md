@@ -29,7 +29,12 @@ atual:
       WIA. Descoberta de scanners, seleção de origem (mesa/alimentador/duplex), catálogo de
       perfis (seção 11), tela de digitalização com progresso, degradação graciosa quando WIA
       está indisponível.
-- [ ] Fase 5 — Automação (detecção de documento, deskew, perspectiva, melhoria)
+- [x] **Fase 5 — Automação**: detecção de documento (segmentação por Otsu + fecho convexo +
+      retângulo de área mínima via "rotating calipers"), correção de perspectiva (homografia de
+      Heckbert), deskew (estimador por perfil de projeção), remoção de fundo/ruído,
+      brilho/contraste/gamma/saturação/nitidez, binarização com remoção de pequenas manchas —
+      tudo orquestrado por `IDocumentEnhancementService` com os presets "Leve/Normal/Forte".
+      "Melhorar automaticamente" e "Reverter para original" no visualizador.
 - [ ] Fase 6 — PDF
 - [ ] Fase 7 — Composição frente/verso
 - [ ] Fase 8 — Conversão em lote

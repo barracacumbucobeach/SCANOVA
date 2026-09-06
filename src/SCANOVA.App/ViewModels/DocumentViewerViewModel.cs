@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SCANOVA.App.Services;
+using SCANOVA.Core.Enums;
 using SCANOVA.Core.Exceptions;
 using SCANOVA.Core.Interfaces;
 using SCANOVA.Core.Models;
@@ -19,6 +20,7 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
     private readonly IImageService _imageService;
     private readonly IImageExporter _imageExporter;
     private readonly ITiffDocumentPipeline _tiffPipeline;
+    private readonly IDocumentEnhancementService _enhancementService;
     private readonly IFilePickerService _filePicker;
     private readonly INotificationService _notifications;
 
@@ -47,12 +49,14 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         IImageService imageService,
         IImageExporter imageExporter,
         ITiffDocumentPipeline tiffPipeline,
+        IDocumentEnhancementService enhancementService,
         IFilePickerService filePicker,
         INotificationService notifications)
     {
         _imageService = imageService;
         _imageExporter = imageExporter;
         _tiffPipeline = tiffPipeline;
+        _enhancementService = enhancementService;
         _filePicker = filePicker;
         _notifications = notifications;
     }
@@ -146,6 +150,53 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
     {
         ClearPendingCrop();
         IsCropMode = false;
+    }
+
+    /// <summary>
+    /// "Melhorar automaticamente" (seção 20): detecta o documento, endireita, corrige
+    /// perspectiva, remove fundo/ruído e ajusta tom — tudo em uma etapa, sem o usuário precisar
+    /// entender os termos técnicos por trás (seção 131). Não é destrutivo: "Reverter" volta ao
+    /// original a qualquer momento, antes de salvar.
+    /// </summary>
+    [RelayCommand]
+    private async Task EnhanceAutomaticallyAsync()
+    {
+        if (_current is null)
+        {
+            return;
+        }
+
+        var source = _current;
+        IsBusy = true;
+        try
+        {
+            _current = await Task.Run(() => _enhancementService.AutoEnhance(source, EnhancementPreset.Normal));
+            ClearPendingCrop();
+            await RefreshBitmapAsync();
+            _notifications.ShowSuccess("Documento melhorado automaticamente.");
+        }
+        catch (Exception)
+        {
+            _notifications.ShowError("Não foi possível melhorar o documento automaticamente.");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task RevertToOriginalAsync()
+    {
+        if (_original is null)
+        {
+            return;
+        }
+
+        _current = _original;
+        ClearPendingCrop();
+        await RefreshBitmapAsync();
+        _notifications.ShowSuccess("Documento revertido para o original.");
     }
 
     // Seção 66: no menu de formato, mostrar "TIFF Documental (CCITT Group 4 — 200 DPI)" em vez
