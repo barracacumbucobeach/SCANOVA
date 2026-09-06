@@ -1,8 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SCANOVA.App.Services;
 using SCANOVA.App.Views;
+using WinRT.Interop;
 
 namespace SCANOVA.App;
 
@@ -14,10 +17,24 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
 
         Title = "SCANOVA — Digitalização e Conversão Documental";
+        SetWindowIcon();
 
         var navigation = App.Services.GetRequiredService<INavigationService>();
         navigation.SetFrame(ContentFrame);
         navigation.NavigateTo(typeof(DashboardPage));
+    }
+
+    /// <summary>
+    /// Define o ícone da janela (barra de título/Alt+Tab). O ícone do executável/taskbar antes
+    /// da janela abrir vem de <c>ApplicationIcon</c> no csproj — este é o ícone em tempo de
+    /// execução da própria janela, que o Windows App SDK não herda automaticamente.
+    /// </summary>
+    private void SetWindowIcon()
+    {
+        var windowHandle = WindowNative.GetWindowHandle(this);
+        var windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
+        appWindow.SetIcon("Assets/scanova.ico");
     }
 
     private void RootNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

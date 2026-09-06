@@ -18,6 +18,7 @@
     <RootNamespace>SCANOVA.App</RootNamespace>
     <AssemblyName>SCANOVA</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\scanova.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
@@ -46,8 +47,11 @@
   <ItemGroup>
     <!-- Logo oficial (seção 94/95). scanova-icon.png é a marca isolada (recortada da logo
          completa), usada em contextos pequenos/quadrados; scanova-logo.png é a peça horizontal
-         completa (marca + wordmark), usada em cabeçalhos e na tela Sobre. -->
-    <Content Include="Assets\**\*.png">
+         completa (marca + wordmark), usada em cabeçalhos e na tela Sobre. scanova.ico (gerado a
+         partir do recorte, multi-resolução 16-256px) é o ícone do executável (ApplicationIcon,
+         acima) E precisa também estar solto em Assets/ no output, pois MainWindow define o
+         ícone da janela em runtime via AppWindow.SetIcon("Assets/scanova.ico"). -->
+    <Content Include="Assets\**\*.png;Assets\**\*.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
