@@ -7,10 +7,16 @@ using PixelFormat = SCANOVA.Core.Enums.PixelFormat;
 
 namespace SCANOVA.Imaging.ImageLoading;
 
-/// <summary>Grava um <see cref="RasterImage"/> como PNG, JPG ou BMP usando SkiaSharp.</summary>
+/// <summary>
+/// Grava um <see cref="RasterImage"/> como PNG ou JPG usando SkiaSharp. Note que o Skia não
+/// possui encoder de BMP (apenas decoder) — por isso BMP não está entre os formatos de
+/// exportação aqui, o que é consistente com o menu "Salvar como" da especificação (seção 32),
+/// que também não lista BMP como destino (BMP só é suportado como formato de abertura —
+/// seção 28).
+/// </summary>
 public sealed class SkiaImageExporter : IImageExporter
 {
-    public IReadOnlyCollection<string> SupportedExtensions { get; } = new[] { ".png", ".jpg", ".jpeg", ".bmp" };
+    public IReadOnlyCollection<string> SupportedExtensions { get; } = new[] { ".png", ".jpg", ".jpeg" };
 
     public async Task SaveAsync(RasterImage image, string filePath, int quality = 90, CancellationToken cancellationToken = default)
     {
@@ -21,7 +27,6 @@ public sealed class SkiaImageExporter : IImageExporter
         {
             ".png" => SKEncodedImageFormat.Png,
             ".jpg" or ".jpeg" => SKEncodedImageFormat.Jpeg,
-            ".bmp" => SKEncodedImageFormat.Bmp,
             _ => throw new ImageLoadException(
                 $"Formato de exportação \"{extension}\" não é suportado.",
                 $"Extensão não suportada por {nameof(SkiaImageExporter)}: {extension}"),
