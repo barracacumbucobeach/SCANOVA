@@ -99,7 +99,7 @@ public sealed partial class MainWindow : Window
                 navigation.NavigateTo(typeof(DashboardPage));
                 break;
             case "Scan":
-                navigation.NavigateToPlaceholder("Digitalizar", "A digitalização via WIA será implementada na Fase 4 (Scanner).");
+                navigation.NavigateTo(typeof(ScanPage));
                 break;
             case "Documents":
                 navigation.NavigateToPlaceholder("Documentos", "Use \"Abrir documento\" no Início para abrir uma imagem. Uma lista de documentos recentes/multi-página será adicionada em uma próxima etapa.");

@@ -2,8 +2,12 @@ using SCANOVA.Core.Enums;
 
 namespace SCANOVA.Core.Models;
 
-/// <summary>Configuração de uma digitalização, correspondendo a um dos perfis de digitalização (seção 11).</summary>
-public sealed class ScanSettings
+/// <summary>
+/// Configuração de uma digitalização, correspondendo a um dos perfis de digitalização (seção 11).
+/// É um <c>record</c> para permitir ajustar campos individuais (ex.: <c>Source</c>) a partir de
+/// um perfil pré-configurado via <c>with</c>, sem precisar reconstruir tudo manualmente.
+/// </summary>
+public sealed record ScanSettings
 {
     public required string ScannerId { get; init; }
     public ScanSource Source { get; init; } = ScanSource.Automatic;

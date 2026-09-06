@@ -1,0 +1,85 @@
+<Page
+    x:Class="SCANOVA.App.Views.ScanPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!-- Estado: nenhum scanner encontrado (seção 9). -->
+        <StackPanel
+            Visibility="{x:Bind ViewModel.NoScannersFound, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="12"
+            MaxWidth="420">
+            <FontIcon Glyph="&#xE8B9;" FontSize="32" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <TextBlock Text="Nenhum scanner foi encontrado." Style="{ThemeResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" TextAlignment="Center" />
+            <TextBlock
+                Text="Verifique se o scanner está conectado e instalado no Windows."
+                Style="{ThemeResource BodyTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                TextAlignment="Center"
+                TextWrapping="Wrap" />
+            <Button Content="Tentar novamente" Command="{x:Bind ViewModel.RefreshScannersCommand}" HorizontalAlignment="Center" Style="{ThemeResource AccentButtonStyle}" />
+        </StackPanel>
+
+        <!-- Estado: formulário de digitalização. -->
+        <StackPanel
+            Visibility="{x:Bind ViewModel.NoScannersFound, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}"
+            MaxWidth="420"
+            HorizontalAlignment="Left"
+            Margin="32,24,32,24"
+            Spacing="16">
+
+            <TextBlock Text="Digitalizar" Style="{ThemeResource TitleLargeTextBlockStyle}" />
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="Scanner" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <ComboBox
+                    ItemsSource="{x:Bind ViewModel.Scanners}"
+                    SelectedItem="{x:Bind ViewModel.SelectedScanner, Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    HorizontalAlignment="Stretch"
+                    IsEnabled="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="Origem" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <ComboBox
+                    ItemsSource="{x:Bind ViewModel.Sources}"
+                    SelectedItem="{x:Bind ViewModel.SelectedSource, Mode=TwoWay}"
+                    DisplayMemberPath="Label"
+                    HorizontalAlignment="Stretch" />
+            </StackPanel>
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="Perfil" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                <ComboBox
+                    ItemsSource="{x:Bind ViewModel.Profiles}"
+                    SelectedItem="{x:Bind ViewModel.SelectedProfile, Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    HorizontalAlignment="Stretch" />
+                <TextBlock
+                    Text="{x:Bind ViewModel.SelectedProfile.Description, Mode=OneWay}"
+                    Style="{ThemeResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <ProgressBar
+                Value="{x:Bind ViewModel.ScanProgress, Mode=OneWay}"
+                Maximum="1"
+                Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+            <Button
+                Content="DIGITALIZAR"
+                Command="{x:Bind ViewModel.ScanCommand}"
+                Style="{ThemeResource AccentButtonStyle}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center" />
+        </StackPanel>
+
+        <ProgressRing IsActive="{x:Bind ViewModel.IsLoadingScanners, Mode=OneWay}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="48" Height="48" />
+    </Grid>
+</Page>

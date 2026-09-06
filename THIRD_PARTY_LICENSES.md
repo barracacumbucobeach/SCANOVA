@@ -22,6 +22,7 @@ distribuição comercial fechada sem exigir a abertura do código-fonte do SCANO
 | xunit / xunit.runner.visualstudio | 2.4.x | Apache 2.0 / MIT | Testes automatizados (seções 75-77) | https://github.com/xunit/xunit |
 | coverlet.collector | 6.0.0 | MIT | Cobertura de testes | https://github.com/coverlet-coverage/coverlet |
 | BitMiracle.LibTiff.NET | 2.4.660 | Licença estilo BSD-3-Clause (texto completo verificado em https://raw.githubusercontent.com/BitMiracle/libtiff.net/master/license.txt — Copyright Bit Miracle, com trechos herdados do libtiff original de Sam Leffler/Silicon Graphics e do IJG). Permite uso comercial e redistribuição, exige apenas manter o aviso de copyright; proíbe usar o nome "Bit Miracle" para endosso. Compatível com distribuição comercial fechada. | Encoder/decoder TIFF, 1-bit, CCITT Group 4 — requisito comercial crítico do produto (seção 22/23/27) | https://github.com/BitMiracle/libtiff.net |
+| NAPS2.Wia | 2.0.3 | MIT (`PackageLicenseExpression` no .csproj do pacote, verificado no código-fonte do repositório) | Wrapper de baixo nível para Windows Image Acquisition (WIA 1.0/2.0), mantido pelo projeto NAPS2 — evita reimplementar/adivinhar constantes de propriedade e GUIDs do WIA via COM tardio (seção 9) | https://github.com/cyanfish/naps2-wia |
 
 ## Planejadas para as próximas fases (a confirmar/registrar antes do uso)
 

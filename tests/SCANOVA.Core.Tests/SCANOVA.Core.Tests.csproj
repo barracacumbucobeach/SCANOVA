@@ -22,4 +22,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SCANOVA.Core\SCANOVA.Core.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -5,8 +5,9 @@ using SCANOVA.App.ViewModels;
 using SCANOVA.Core.Interfaces;
 using SCANOVA.Imaging;
 using SCANOVA.Infrastructure;
-using SCANOVA.Tiff;
 using SCANOVA.Infrastructure.FileSystem;
+using SCANOVA.Scanner;
+using SCANOVA.Tiff;
 
 namespace SCANOVA.App;
 
@@ -35,6 +36,7 @@ public partial class App : Application
         services.AddScanovaInfrastructure();
         services.AddScanovaImaging();
         services.AddScanovaTiff();
+        services.AddScanovaScanner();
 
         services.AddSingleton<INavigationService, FrameNavigationService>();
         services.AddSingleton<INotificationService, NotificationService>();
@@ -42,6 +44,7 @@ public partial class App : Application
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<DocumentViewerViewModel>();
+        services.AddTransient<ScanViewModel>();
 
         return services.BuildServiceProvider();
     }

@@ -24,7 +24,11 @@ atual:
       binarização Otsu/global/adaptativa → CCITT Group 4 → validação), via
       BitMiracle.LibTiff.NET. `ITiffDocumentPipeline` conectado ao "Salvar como" do
       visualizador — marco funcional da seção 152 (abrir imagem → TIFF Documental → validado).
-- [ ] Fase 4 — Scanner (WIA)
+- [x] **Fase 4 — Scanner**: `IScannerService` via WIA (Windows Image Acquisition), usando a
+      biblioteca `NAPS2.Wia` (MIT) em vez de COM tardio — evita adivinhar constantes/GUIDs do
+      WIA. Descoberta de scanners, seleção de origem (mesa/alimentador/duplex), catálogo de
+      perfis (seção 11), tela de digitalização com progresso, degradação graciosa quando WIA
+      está indisponível.
 - [ ] Fase 5 — Automação (detecção de documento, deskew, perspectiva, melhoria)
 - [ ] Fase 6 — PDF
 - [ ] Fase 7 — Composição frente/verso

@@ -51,7 +51,7 @@ public sealed partial class DashboardViewModel : ObservableObject
     private async Task ScanDocumentAsync()
     {
         await DismissWelcomeAsync();
-        _navigation.NavigateToPlaceholder("Digitalizar documento", "A digitalização via WIA será implementada na Fase 4 (Scanner).");
+        _navigation.NavigateTo(typeof(ScanPage));
     }
 
     [RelayCommand]

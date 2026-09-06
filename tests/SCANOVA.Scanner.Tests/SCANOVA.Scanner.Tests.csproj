@@ -22,4 +22,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SCANOVA.Scanner\SCANOVA.Scanner.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Core\SCANOVA.Core.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Imaging\SCANOVA.Imaging.csproj" />
+  </ItemGroup>
+
 </Project>
