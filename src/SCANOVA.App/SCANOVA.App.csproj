@@ -43,4 +43,13 @@
     <ProjectReference Include="..\SCANOVA.Infrastructure\SCANOVA.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Logo oficial (seção 94/95). scanova-icon.png é a marca isolada (recortada da logo
+         completa), usada em contextos pequenos/quadrados; scanova-logo.png é a peça horizontal
+         completa (marca + wordmark), usada em cabeçalhos e na tela Sobre. -->
+    <Content Include="Assets\**\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
