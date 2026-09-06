@@ -6,6 +6,7 @@ using SCANOVA.Core.Interfaces;
 using SCANOVA.Imaging;
 using SCANOVA.Infrastructure;
 using SCANOVA.Infrastructure.FileSystem;
+using SCANOVA.Pdf;
 using SCANOVA.Scanner;
 using SCANOVA.Tiff;
 
@@ -36,6 +37,7 @@ public partial class App : Application
         services.AddScanovaInfrastructure();
         services.AddScanovaImaging();
         services.AddScanovaTiff();
+        services.AddScanovaPdf();
         services.AddScanovaScanner();
 
         services.AddSingleton<INavigationService, FrameNavigationService>();

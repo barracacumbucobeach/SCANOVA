@@ -22,4 +22,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SCANOVA.Pdf\SCANOVA.Pdf.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Core\SCANOVA.Core.csproj" />
+    <!-- Só o projeto de testes referencia SCANOVA.Tiff: usa o LibTiffEncoder de verdade (não um
+         mock) para gerar TIFFs sintéticos e testar ConvertTiffToPdfAsync de ponta a ponta. -->
+    <ProjectReference Include="..\..\src\SCANOVA.Tiff\SCANOVA.Tiff.csproj" />
+  </ItemGroup>
+
 </Project>

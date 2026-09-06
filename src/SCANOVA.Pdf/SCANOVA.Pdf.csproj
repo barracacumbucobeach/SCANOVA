@@ -6,4 +6,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SCANOVA.Core\SCANOVA.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Geração de PDF (páginas de imagem, dimensionadas a partir do DPI). A camada de texto
+         invisível de OCR fica para a Fase 9 — ver docs/PDF.md ("Por que não há camada de texto ainda"). -->
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
+    <!-- Rasterização de páginas PDF existentes (via PDFium). Já traz o SkiaSharp consigo
+         (retorna SKBitmap), então reaproveitamos essa mesma dependência para codificar as
+         páginas de imagem embutidas no PDF, em vez de referenciar SCANOVA.Imaging. -->
+    <PackageReference Include="PDFtoImage" Version="5.4.0" />
+    <!-- Extração de texto NATIVO de um PDF que já contém texto real (sem OCR — seção 109). -->
+    <PackageReference Include="PdfPig" Version="0.1.16" />
+  </ItemGroup>
+
 </Project>

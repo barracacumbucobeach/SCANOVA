@@ -35,7 +35,13 @@ atual:
       brilho/contraste/gamma/saturação/nitidez, binarização com remoção de pequenas manchas —
       tudo orquestrado por `IDocumentEnhancementService` com os presets "Leve/Normal/Forte".
       "Melhorar automaticamente" e "Reverter para original" no visualizador.
-- [ ] Fase 6 — PDF
+- [x] **Fase 6 — PDF**: geração de PDF imagem-only (PDFsharp, MIT) com o tamanho físico exato
+      calculado a partir do DPI de cada página; rasterização de PDFs existentes (PDFtoImage sobre
+      PDFium, MIT/Apache 2.0) — roda de forma idêntica em Windows/Linux/macOS, sem dependência de
+      GDI+; extração de texto nativo de um PDF que já contém texto, sem OCR (PdfPig, Apache 2.0);
+      conversão TIFF → PDF preservando todas as páginas. "Documento PDF" agora é uma opção real
+      em "Salvar como" no visualizador. A camada de texto invisível de OCR (PDF pesquisável) fica
+      para a Fase 9, quando o motor de OCR fornecer o texto e a posição de cada palavra.
 - [ ] Fase 7 — Composição frente/verso
 - [ ] Fase 8 — Conversão em lote
 - [ ] Fase 9 — OCR

@@ -23,12 +23,15 @@ distribuição comercial fechada sem exigir a abertura do código-fonte do SCANO
 | coverlet.collector | 6.0.0 | MIT | Cobertura de testes | https://github.com/coverlet-coverage/coverlet |
 | BitMiracle.LibTiff.NET | 2.4.660 | Licença estilo BSD-3-Clause (texto completo verificado em https://raw.githubusercontent.com/BitMiracle/libtiff.net/master/license.txt — Copyright Bit Miracle, com trechos herdados do libtiff original de Sam Leffler/Silicon Graphics e do IJG). Permite uso comercial e redistribuição, exige apenas manter o aviso de copyright; proíbe usar o nome "Bit Miracle" para endosso. Compatível com distribuição comercial fechada. | Encoder/decoder TIFF, 1-bit, CCITT Group 4 — requisito comercial crítico do produto (seção 22/23/27) | https://github.com/BitMiracle/libtiff.net |
 | NAPS2.Wia | 2.0.3 | MIT (`PackageLicenseExpression` no .csproj do pacote, verificado no código-fonte do repositório) | Wrapper de baixo nível para Windows Image Acquisition (WIA 1.0/2.0), mantido pelo projeto NAPS2 — evita reimplementar/adivinhar constantes de propriedade e GUIDs do WIA via COM tardio (seção 9) | https://github.com/cyanfish/naps2-wia |
+| PDFsharp | 6.2.4 | MIT (verificado em `LICENSE` na raiz do repositório) | Geração de PDF (páginas de imagem, tamanho físico calculado a partir do DPI) | https://github.com/empira/PDFsharp |
+| PDFtoImage | 5.4.0 | MIT (verificado em `LICENSE` e no `PackageLicenseExpression` do .csproj do pacote) | Rasterização de páginas PDF existentes em imagem, via PDFium — roda de forma idêntica em Windows/Linux/macOS | https://github.com/sungaila/PDFtoImage |
+| pdfium-binaries (empacotamento do PDFium usado pelo PDFtoImage) | acompanha a versão do PDFtoImage | MIT (scripts de build) sobre o motor PDFium do Chromium, licenciado Apache License 2.0 (verificado em `LICENSE` no repositório `chromium/pdfium`) | Motor de renderização de PDF nativo (PDFium/Chromium) | https://github.com/bblanchon/pdfium-binaries |
+| PdfPig | 0.1.16 | Apache 2.0 (verificado em `LICENSE`; inclui componentes de terceiros sob licença BSD — PDFBox/FontBox) | Extração de texto NATIVO de um PDF que já contém texto real, sem OCR (seção 109) | https://github.com/UglyToad/PdfPig |
 
 ## Planejadas para as próximas fases (a confirmar/registrar antes do uso)
 
 | Biblioteca | Licença (a confirmar na fase correspondente) | Finalidade | Fase |
 |---|---|---|---|
-| PDF: candidatos — PDFsharp (MIT) para escrita; PDFtoImage/Docnet.Core ou PDFium (Apache 2.0/BSD) para rasterização; PdfPig (Apache 2.0) para extração de texto nativo | A confirmar | Leitura/rasterização/geração de PDF | Fase 6 |
 | Tesseract (motor OCR) + wrapper .NET (ex.: charlesw/tesseract, MIT) | Apache 2.0 (Tesseract) / MIT (wrapper) | OCR local, offline, com modelo em português | Fase 9 |
 | DocumentFormat.OpenXml | MIT | Exportação de texto reconhecido para DOCX | Fase 9 |
 

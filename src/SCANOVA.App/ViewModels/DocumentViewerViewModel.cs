@@ -6,6 +6,7 @@ using SCANOVA.Core.Enums;
 using SCANOVA.Core.Exceptions;
 using SCANOVA.Core.Interfaces;
 using SCANOVA.Core.Models;
+using CorePixelFormat = SCANOVA.Core.Enums.PixelFormat;
 
 namespace SCANOVA.App.ViewModels;
 
@@ -20,6 +21,7 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
     private readonly IImageService _imageService;
     private readonly IImageExporter _imageExporter;
     private readonly ITiffDocumentPipeline _tiffPipeline;
+    private readonly IPdfService _pdfService;
     private readonly IDocumentEnhancementService _enhancementService;
     private readonly IFilePickerService _filePicker;
     private readonly INotificationService _notifications;
@@ -49,6 +51,7 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         IImageService imageService,
         IImageExporter imageExporter,
         ITiffDocumentPipeline tiffPipeline,
+        IPdfService pdfService,
         IDocumentEnhancementService enhancementService,
         IFilePickerService filePicker,
         INotificationService notifications)
@@ -56,6 +59,7 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         _imageService = imageService;
         _imageExporter = imageExporter;
         _tiffPipeline = tiffPipeline;
+        _pdfService = pdfService;
         _enhancementService = enhancementService;
         _filePicker = filePicker;
         _notifications = notifications;
@@ -216,6 +220,7 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
         var choices = new Dictionary<string, IList<string>>
         {
             [TiffDocumentalLabel] = new List<string> { ".tif" },
+            ["Documento PDF"] = new List<string> { ".pdf" },
             ["Imagem PNG"] = new List<string> { ".png" },
             ["Imagem JPG"] = new List<string> { ".jpg" },
         };
@@ -244,6 +249,10 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
             if (extension is ".tif" or ".tiff")
             {
                 await SaveAsTiffDocumentalAsync(path);
+            }
+            else if (extension == ".pdf")
+            {
+                await SaveAsPdfAsync(path);
             }
             else
             {
@@ -291,6 +300,32 @@ public sealed partial class DocumentViewerViewModel : ObservableObject
             : string.Empty;
 
         _notifications.ShowSuccess($"TIFF Documental salvo e validado: 200 DPI, 1 bit, CCITT Group 4{sizeInfo}.");
+    }
+
+    /// <summary>
+    /// Salva o documento atual como um PDF de página única (Fase 6). O modo do PDF é escolhido a
+    /// partir do formato de pixel atual da imagem (preto e branco/escala de cinza/cor) — o
+    /// usuário não precisa escolher isso manualmente.
+    /// </summary>
+    private async Task SaveAsPdfAsync(string path)
+    {
+        if (_current is null)
+        {
+            return;
+        }
+
+        var mode = _current.Format switch
+        {
+            CorePixelFormat.Bilevel1 => PdfMode.Documental,
+            CorePixelFormat.Gray8 => PdfMode.Grayscale,
+            _ => PdfMode.Color,
+        };
+        var dpi = _current.HorizontalDpi > 0 ? _current.HorizontalDpi : 200;
+        var settings = new PdfSettings { Mode = mode, Dpi = dpi };
+
+        await _pdfService.WritePdfAsync(new[] { _current }, settings, path);
+
+        _notifications.ShowSuccess("Documento PDF salvo com sucesso.");
     }
 
     private static string FormatBytes(long bytes)
