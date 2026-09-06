@@ -28,16 +28,21 @@ public sealed class SkiaImageLoader : IImageLoader
             return Task.FromResult(false);
         }
 
-        try
+        // Seção 7/61: mesmo essa checagem leve não deve rodar na UI thread quando chamada a
+        // partir dela — despacha para o thread pool.
+        return Task.Run(() =>
         {
-            using var stream = File.OpenRead(filePath);
-            using var codec = SKCodec.Create(stream);
-            return Task.FromResult(codec is not null);
-        }
-        catch
-        {
-            return Task.FromResult(false);
-        }
+            try
+            {
+                using var stream = File.OpenRead(filePath);
+                using var codec = SKCodec.Create(stream);
+                return codec is not null;
+            }
+            catch
+            {
+                return false;
+            }
+        }, cancellationToken);
     }
 
     public async Task<RasterImage> LoadAsync(string filePath, CancellationToken cancellationToken = default)
@@ -77,25 +82,29 @@ public sealed class SkiaImageLoader : IImageLoader
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        using var data = SKData.Create(stream);
-        using var codec = SKCodec.Create(data);
-        if (codec is null)
+        // Seção 7/61: decodificação é potencialmente pesada para imagens grandes de scanner —
+        // nunca deve rodar na UI thread. Despacha o trabalho síncrono do Skia para o thread pool.
+        return Task.Run(() =>
         {
-            throw new ImageLoadException(
-                "O arquivo não é uma imagem válida ou o formato não é suportado.",
-                "SKCodec.Create retornou null — formato não reconhecido ou dados corrompidos.");
-        }
+            using var data = SKData.Create(stream);
+            using var codec = SKCodec.Create(data);
+            if (codec is null)
+            {
+                throw new ImageLoadException(
+                    "O arquivo não é uma imagem válida ou o formato não é suportado.",
+                    "SKCodec.Create retornou null — formato não reconhecido ou dados corrompidos.");
+            }
 
-        using var bitmap = SKBitmap.Decode(codec);
-        if (bitmap is null)
-        {
-            throw new ImageLoadException(
-                "Não foi possível decodificar a imagem. O arquivo pode estar corrompido.",
-                "SKBitmap.Decode retornou null.");
-        }
+            using var bitmap = SKBitmap.Decode(codec);
+            if (bitmap is null)
+            {
+                throw new ImageLoadException(
+                    "Não foi possível decodificar a imagem. O arquivo pode estar corrompido.",
+                    "SKBitmap.Decode retornou null.");
+            }
 
-        var result = ConvertToRasterImage(bitmap);
-        return Task.FromResult(result);
+            return ConvertToRasterImage(bitmap);
+        }, cancellationToken);
     }
 
     private static RasterImage ConvertToRasterImage(SKBitmap bitmap)

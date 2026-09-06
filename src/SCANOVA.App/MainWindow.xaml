@@ -65,7 +65,17 @@
                 </NavigationViewItem>
             </NavigationView.MenuItems>
 
-            <Frame x:Name="ContentFrame" />
+            <Grid>
+                <Frame x:Name="ContentFrame" />
+
+                <!-- Notificações discretas (seção 97): sucesso/erro exibidos aqui, nunca via popup modal. -->
+                <InfoBar
+                    x:Name="GlobalInfoBar"
+                    IsOpen="False"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Stretch"
+                    Margin="16,8,16,0" />
+            </Grid>
         </NavigationView>
     </Grid>
 </Window>

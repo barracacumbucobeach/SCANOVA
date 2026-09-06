@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SCANOVA.App.Services;
+using SCANOVA.App.Views;
+using SCANOVA.Core.Exceptions;
 using SCANOVA.Core.Interfaces;
 
 namespace SCANOVA.App.ViewModels;
@@ -13,14 +15,28 @@ public sealed partial class DashboardViewModel : ObservableObject
 {
     private readonly INavigationService _navigation;
     private readonly ISettingsService _settings;
+    private readonly IFilePickerService _filePicker;
+    private readonly IImageLoader _imageLoader;
+    private readonly INotificationService _notifications;
 
     [ObservableProperty]
     private bool showWelcomeBanner;
 
-    public DashboardViewModel(INavigationService navigation, ISettingsService settings)
+    [ObservableProperty]
+    private bool isOpeningDocument;
+
+    public DashboardViewModel(
+        INavigationService navigation,
+        ISettingsService settings,
+        IFilePickerService filePicker,
+        IImageLoader imageLoader,
+        INotificationService notifications)
     {
         _navigation = navigation;
         _settings = settings;
+        _filePicker = filePicker;
+        _imageLoader = imageLoader;
+        _notifications = notifications;
         ShowWelcomeBanner = !_settings.Current.FirstRunCompleted;
     }
 
@@ -39,8 +55,44 @@ public sealed partial class DashboardViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenDocument() =>
-        _navigation.NavigateToPlaceholder("Abrir documento", "A abertura de imagens e PDF será habilitada na Fase 2 (Imagens) e Fase 6 (PDF).");
+    private async Task OpenDocumentAsync()
+    {
+        string? path;
+        try
+        {
+            path = await _filePicker.PickImageFileAsync();
+        }
+        catch (Exception)
+        {
+            _notifications.ShowError("Não foi possível abrir a janela de seleção de arquivo.");
+            return;
+        }
+
+        if (path is null)
+        {
+            return; // usuário cancelou
+        }
+
+        IsOpeningDocument = true;
+        try
+        {
+            var image = await _imageLoader.LoadAsync(path);
+            await DismissWelcomeAsync();
+            _navigation.NavigateTo(typeof(DocumentViewerPage), new DocumentViewerParameter(path, image));
+        }
+        catch (ScanovaException ex)
+        {
+            _notifications.ShowError(ex.UserMessage);
+        }
+        catch (Exception)
+        {
+            _notifications.ShowError("Não foi possível abrir o arquivo selecionado.");
+        }
+        finally
+        {
+            IsOpeningDocument = false;
+        }
+    }
 
     [RelayCommand]
     private void Convert() =>

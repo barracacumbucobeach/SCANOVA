@@ -18,7 +18,7 @@ public sealed class SkiaImageExporter : IImageExporter
 {
     public IReadOnlyCollection<string> SupportedExtensions { get; } = new[] { ".png", ".jpg", ".jpeg" };
 
-    public async Task SaveAsync(RasterImage image, string filePath, int quality = 90, CancellationToken cancellationToken = default)
+    public Task SaveAsync(RasterImage image, string filePath, int quality = 90, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -32,45 +32,49 @@ public sealed class SkiaImageExporter : IImageExporter
                 $"Extensão não suportada por {nameof(SkiaImageExporter)}: {extension}"),
         };
 
-        using var bitmap = SkiaConversions.ToSkBitmap(image);
-        using var skImage = SKImage.FromBitmap(bitmap);
-        using var encoded = skImage.Encode(format, Math.Clamp(quality, 1, 100));
-
-        if (encoded is null)
+        // Seção 7/61: codificação/gravação em disco não deve rodar na UI thread.
+        return Task.Run(() =>
         {
-            throw new ImageLoadException(
-                "Não foi possível gerar o arquivo de imagem.",
-                $"SKImage.Encode retornou null para o formato {format}.");
-        }
+            using var bitmap = SkiaConversions.ToSkBitmap(image);
+            using var skImage = SKImage.FromBitmap(bitmap);
+            using var encoded = skImage.Encode(format, Math.Clamp(quality, 1, 100));
 
-        try
-        {
-            var directory = Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrEmpty(directory))
+            if (encoded is null)
             {
-                Directory.CreateDirectory(directory);
+                throw new ImageLoadException(
+                    "Não foi possível gerar o arquivo de imagem.",
+                    $"SKImage.Encode retornou null para o formato {format}.");
             }
 
-            await using var fileStream = File.Create(filePath);
-            encoded.SaveTo(fileStream);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            throw new FileAccessException(
-                "Não foi possível salvar o arquivo. Verifique se a pasta está disponível e tente novamente.",
-                $"Acesso negado ao salvar: {filePath}", ex);
-        }
-        catch (DirectoryNotFoundException ex)
-        {
-            throw new FileAccessException(
-                "A pasta de destino não foi encontrada.",
-                $"Diretório inexistente: {filePath}", ex);
-        }
-        catch (IOException ex)
-        {
-            throw new FileAccessException(
-                "Não foi possível salvar o arquivo. Verifique o espaço em disco disponível.",
-                $"Erro de E/S ao salvar: {filePath}", ex);
-        }
+            try
+            {
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                using var fileStream = File.Create(filePath);
+                encoded.SaveTo(fileStream);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                throw new FileAccessException(
+                    "Não foi possível salvar o arquivo. Verifique se a pasta está disponível e tente novamente.",
+                    $"Acesso negado ao salvar: {filePath}", ex);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                throw new FileAccessException(
+                    "A pasta de destino não foi encontrada.",
+                    $"Diretório inexistente: {filePath}", ex);
+            }
+            catch (IOException ex)
+            {
+                throw new FileAccessException(
+                    "Não foi possível salvar o arquivo. Verifique o espaço em disco disponível.",
+                    $"Erro de E/S ao salvar: {filePath}", ex);
+            }
+        }, cancellationToken);
     }
 }

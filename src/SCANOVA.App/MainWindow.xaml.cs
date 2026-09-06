@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,6 +13,13 @@ namespace SCANOVA.App;
 /// <summary>Janela principal: casca de navegação (menu lateral + Frame de conteúdo) descrita na seção 7.</summary>
 public sealed partial class MainWindow : Window
 {
+    private static readonly TimeSpan NotificationDuration = TimeSpan.FromSeconds(4);
+
+    // Capturado explicitamente (em vez de depender de Window.DispatcherQueue) para marshalling
+    // seguro de volta à UI thread a partir do handler de INotificationService.
+    private readonly DispatcherQueue _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+    private int _notificationToken;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -22,6 +30,39 @@ public sealed partial class MainWindow : Window
         var navigation = App.Services.GetRequiredService<INavigationService>();
         navigation.SetFrame(ContentFrame);
         navigation.NavigateTo(typeof(DashboardPage));
+
+        var notifications = App.Services.GetRequiredService<INotificationService>();
+        notifications.Notified += Notifications_Notified;
+    }
+
+    private void Notifications_Notified(object? sender, AppNotification notification)
+    {
+        _dispatcherQueue.TryEnqueue(async () =>
+        {
+            GlobalInfoBar.Title = notification.Severity switch
+            {
+                NotificationSeverity.Success => "Sucesso",
+                NotificationSeverity.Error => "Não foi possível concluir a operação",
+                NotificationSeverity.Warning => "Atenção",
+                _ => "Aviso",
+            };
+            GlobalInfoBar.Message = notification.Message;
+            GlobalInfoBar.Severity = notification.Severity switch
+            {
+                NotificationSeverity.Success => InfoBarSeverity.Success,
+                NotificationSeverity.Error => InfoBarSeverity.Error,
+                NotificationSeverity.Warning => InfoBarSeverity.Warning,
+                _ => InfoBarSeverity.Informational,
+            };
+            GlobalInfoBar.IsOpen = true;
+
+            var myToken = unchecked(++_notificationToken);
+            await Task.Delay(NotificationDuration);
+            if (myToken == _notificationToken)
+            {
+                GlobalInfoBar.IsOpen = false;
+            }
+        });
     }
 
     /// <summary>
@@ -61,7 +102,7 @@ public sealed partial class MainWindow : Window
                 navigation.NavigateToPlaceholder("Digitalizar", "A digitalização via WIA será implementada na Fase 4 (Scanner).");
                 break;
             case "Documents":
-                navigation.NavigateToPlaceholder("Documentos", "A abertura e visualização de documentos será habilitada na Fase 2 (Imagens).");
+                navigation.NavigateToPlaceholder("Documentos", "Use \"Abrir documento\" no Início para abrir uma imagem. Uma lista de documentos recentes/multi-página será adicionada em uma próxima etapa.");
                 break;
             case "Convert":
                 navigation.NavigateToPlaceholder("Converter", "A conversão entre formatos e o processamento em lote serão implementados na Fase 8.");

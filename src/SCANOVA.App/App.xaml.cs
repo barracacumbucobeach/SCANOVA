@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using SCANOVA.App.Services;
 using SCANOVA.App.ViewModels;
 using SCANOVA.Core.Interfaces;
+using SCANOVA.Imaging;
 using SCANOVA.Infrastructure;
 using SCANOVA.Infrastructure.FileSystem;
 
@@ -31,9 +32,14 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         services.AddScanovaInfrastructure();
+        services.AddScanovaImaging();
+
         services.AddSingleton<INavigationService, FrameNavigationService>();
+        services.AddSingleton<INotificationService, NotificationService>();
+        services.AddSingleton<IFilePickerService, FilePickerService>();
 
         services.AddTransient<DashboardViewModel>();
+        services.AddTransient<DocumentViewerViewModel>();
 
         return services.BuildServiceProvider();
     }

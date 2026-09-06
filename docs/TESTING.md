@@ -27,7 +27,7 @@ dotnet test SCANOVA.CrossPlatform.slnf
 |---|---|---|
 | SCANOVA.Infrastructure | `JsonSettingsServiceTests`, `TempFileManagerTests` | ✅ Fase 1 |
 | SCANOVA.Core | — | a preencher conforme modelos ganham lógica não trivial |
-| SCANOVA.Imaging | — | Fase 2 |
+| SCANOVA.Imaging | `SkiaImageLoaderTests`, `SkiaImageExporterTests`, `SkiaImageServiceTests` (25 testes: carregar/exportar, decodificar BMP, arquivo inexistente/corrompido, rotação, flips, crop com clamping, escala de cinza, normalização de DPI) | ✅ Fase 2 |
 | SCANOVA.Tiff | — | Fase 3 (crítico: encoder, 200 DPI, 1-bit, Group 4, validator) |
 | SCANOVA.Pdf | — | Fase 6 |
 | SCANOVA.Ocr | — | Fase 9 |

@@ -17,7 +17,9 @@ atual:
 - [x] **Fase 1 — Fundação**: solução, projetos por camada, injeção de dependência, logging
       local (Serilog), configurações persistidas (JSON), casca de navegação e Dashboard
       (WinUI 3).
-- [ ] Fase 2 — Imagens (abrir, visualizar, crop, rotação, exportação básica)
+- [x] **Fase 2 — Imagens**: abrir (JPG/PNG/BMP/GIF/WEBP), visualizar com zoom (ajustar à tela /
+      1:1), girar, cortar (seleção manual), exportar (PNG/JPG). Decodificação/codificação e
+      transformações rodam fora da UI thread (seção 7/61).
 - [ ] Fase 3 — TIFF (pipeline documental: 200 DPI, 1-bit, CCITT Group 4) — marco crítico do produto
 - [ ] Fase 4 — Scanner (WIA)
 - [ ] Fase 5 — Automação (detecção de documento, deskew, perspectiva, melhoria)
