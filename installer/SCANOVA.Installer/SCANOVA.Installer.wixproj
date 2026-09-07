@@ -32,6 +32,11 @@
     <!-- Versão do instalador — mantida sincronizada manualmente com a versão do produto
          (seção 118). Formato exigido pelo MSI: major.minor.build (sem o 4º componente). -->
     <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0</ProductVersion>
+
+    <!-- $(var.ProductVersion) usado em Product.wxs só existe se a propriedade MSBuild acima for
+         explicitamente repassada como variável de pré-processador do WiX (as duas coisas são
+         namespaces diferentes — uma propriedade MSBuild sozinha não vira "var.X" automaticamente). -->
+    <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
