@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arquivo de recursos .resw propositalmente quase vazio (só o cabeçalho padrão, nenhuma string).
+  SCANOVA não usa localização via .resw — todo o texto da UI já está direto no XAML/C#, em
+  português (seção 8: produto voltado só ao mercado brasileiro nesta fase). Este arquivo existe
+  puramente como workaround de um bug conhecido do Windows App SDK: sem NENHUM arquivo .resw no
+  projeto, os targets de MSBuild que geram o resources.pri simplesmente não disparam, e o WinUI 3
+  não consegue carregar nenhuma página XAML compilada (.xbf) em tempo de execução sem esse
+  índice — mesmo sem nenhum recurso de string de verdade para indexar. Descoberto ao testar o
+  instalador de verdade numa máquina Windows: SCANOVA.exe abria (processo no Gerenciador de
+  Tarefas) mas nenhuma janela aparecia (XamlParseException em MainWindow.InitializeComponent(),
+  porque resources.pri nunca existia em bin\ — nem antes, nem depois de copiar a pasta de
+  publish). A pasta "pt-BR" reflete o idioma real (único) do aplicativo.
+-->
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+</root>

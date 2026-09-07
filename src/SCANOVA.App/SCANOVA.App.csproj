@@ -66,4 +66,16 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Strings/pt-BR/Resources.resw é propositalmente quase vazio (ver comentário no próprio
+         arquivo) — SCANOVA não usa .resw pra texto de UI (tudo já em português, direto no
+         XAML/C#). Ele só existe porque, sem NENHUM .resw no projeto, os targets do Windows App
+         SDK que geram resources.pri não disparam, e sem resources.pri o WinUI 3 não consegue
+         carregar nenhuma página XAML compilada em runtime (XamlParseException logo na primeira
+         janela) — confirmado testando o instalador de verdade numa máquina Windows. O item
+         <PRIResource> explícito (em vez de confiar só no globbing implícito do SDK) é o
+         workaround documentado para builds em que esse globbing falha. -->
+    <PRIResource Include="Strings\**\*.resw" />
+  </ItemGroup>
+
 </Project>
