@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SCANOVA.Core.Models;
 using CorePixelFormat = SCANOVA.Core.Enums.PixelFormat;
