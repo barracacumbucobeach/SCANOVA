@@ -1,0 +1,27 @@
+{
+  "solution": {
+    "path": "SCANOVA.sln",
+    "projects": [
+      "src/SCANOVA.Core/SCANOVA.Core.csproj",
+      "src/SCANOVA.Infrastructure/SCANOVA.Infrastructure.csproj",
+      "src/SCANOVA.Imaging/SCANOVA.Imaging.csproj",
+      "src/SCANOVA.Tiff/SCANOVA.Tiff.csproj",
+      "src/SCANOVA.Pdf/SCANOVA.Pdf.csproj",
+      "src/SCANOVA.Batch/SCANOVA.Batch.csproj",
+      "src/SCANOVA.Ocr/SCANOVA.Ocr.csproj",
+      "src/SCANOVA.Scanner/SCANOVA.Scanner.csproj",
+      "src/SCANOVA.Licensing/SCANOVA.Licensing.csproj",
+      "tools/SCANOVA.LicenseTool/SCANOVA.LicenseTool.csproj",
+      "tests/SCANOVA.Core.Tests/SCANOVA.Core.Tests.csproj",
+      "tests/SCANOVA.Infrastructure.Tests/SCANOVA.Infrastructure.Tests.csproj",
+      "tests/SCANOVA.Imaging.Tests/SCANOVA.Imaging.Tests.csproj",
+      "tests/SCANOVA.Tiff.Tests/SCANOVA.Tiff.Tests.csproj",
+      "tests/SCANOVA.Pdf.Tests/SCANOVA.Pdf.Tests.csproj",
+      "tests/SCANOVA.Batch.Tests/SCANOVA.Batch.Tests.csproj",
+      "tests/SCANOVA.Ocr.Tests/SCANOVA.Ocr.Tests.csproj",
+      "tests/SCANOVA.Scanner.Tests/SCANOVA.Scanner.Tests.csproj",
+      "tests/SCANOVA.Integration.Tests/SCANOVA.Integration.Tests.csproj",
+      "tests/SCANOVA.Licensing.Tests/SCANOVA.Licensing.Tests.csproj"
+    ]
+  }
+}

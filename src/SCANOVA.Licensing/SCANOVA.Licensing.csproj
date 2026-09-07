@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Só depende de SCANOVA.Core: ILicenseService, LicenseInfo, LicenseStatus,
+         ProcessingResult — mesmo padrão de SCANOVA.Pdf/SCANOVA.Batch/SCANOVA.Ocr dependendo só
+         de interfaces/modelos do Core. -->
+    <ProjectReference Include="..\SCANOVA.Core\SCANOVA.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- DPAPI (Windows Data Protection API) para criptografar a licença ativada em disco
+         (seção: armazenamento seguro) — parte do próprio dotnet/runtime (MIT), só publicada
+         como pacote separado porque é específica de plataforma. Fora do Windows,
+         SecureLicenseStore degrada para gravação sem criptografia (só usada pelos testes
+         automatizados neste ambiente cross-platform — o aplicativo em si só roda no Windows). -->
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Lista de licenças revogadas (seção: licença pode ser revogada pelo fabricante — fraude,
+         estorno etc.). Embutida no aplicativo e atualizada a cada versão lançada; nunca requer
+         conexão com a internet para ser consultada (o SCANOVA nunca "liga para casa"). -->
+    <EmbeddedResource Include="Revocation\RevokedLicenses.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Permite testar diretamente os componentes internos (validador de chave, envelope
+         assinado, armazenamento seguro, registro de revogação) sem precisar expô-los
+         publicamente. -->
+    <InternalsVisibleTo Include="SCANOVA.Licensing.Tests" />
+  </ItemGroup>
+
+</Project>

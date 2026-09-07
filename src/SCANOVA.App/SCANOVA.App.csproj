@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Projeto WinUI 3 (Windows App SDK) — requer Windows + Visual Studio 2022 (workload
+    ".NET Desktop Development" + "Windows App SDK C#/WinRT") para restaurar e compilar.
+    NÃO compila em Linux/macOS: os pacotes de referência do Windows SDK e o compilador XAML
+    exigem o SDK do Windows. Ver docs/BUILD.md.
+
+    Modelo de implantação: "Unpackaged" (WindowsPackageType=None) — decisão final da Fase 11
+    (seção 91): o instalador é um MSI tradicional (WiX, ver installer/), não MSIX, para o
+    SCANOVA poder ser distribuído diretamente pelo fabricante (site próprio, e-mail) sem
+    depender da Microsoft Store nem de um certificado de assinatura de pacote MSIX — o mesmo
+    raciocínio "sem depender de infraestrutura de terceiros" já aplicado ao licenciamento
+    (Fase 10, seção 146: licença vitalícia sem servidor de ativação).
+  -->
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>SCANOVA.App</RootNamespace>
+    <AssemblyName>SCANOVA</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\scanova.ico</ApplicationIcon>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SCANOVA.Core\SCANOVA.Core.csproj" />
+    <ProjectReference Include="..\SCANOVA.Infrastructure\SCANOVA.Infrastructure.csproj" />
+    <ProjectReference Include="..\SCANOVA.Imaging\SCANOVA.Imaging.csproj" />
+    <ProjectReference Include="..\SCANOVA.Tiff\SCANOVA.Tiff.csproj" />
+    <ProjectReference Include="..\SCANOVA.Pdf\SCANOVA.Pdf.csproj" />
+    <ProjectReference Include="..\SCANOVA.Batch\SCANOVA.Batch.csproj" />
+    <ProjectReference Include="..\SCANOVA.Scanner\SCANOVA.Scanner.csproj" />
+    <ProjectReference Include="..\SCANOVA.Ocr\SCANOVA.Ocr.csproj" />
+    <ProjectReference Include="..\SCANOVA.Licensing\SCANOVA.Licensing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Logo oficial (seção 94/95). scanova-icon.png é a marca isolada (recortada da logo
+         completa), usada em contextos pequenos/quadrados; scanova-logo.png é a peça horizontal
+         completa (marca + wordmark), usada em cabeçalhos e na tela Sobre. scanova.ico (gerado a
+         partir do recorte, multi-resolução 16-256px) é o ícone do executável (ApplicationIcon,
+         acima) E precisa também estar solto em Assets/ no output, pois MainWindow define o
+         ícone da janela em runtime via AppWindow.SetIcon("Assets/scanova.ico"). -->
+    <Content Include="Assets\**\*.png;Assets\**\*.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

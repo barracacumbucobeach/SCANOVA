@@ -1,0 +1,48 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="SCANOVA"
+    Manufacturer="SCANOVA"
+    Version="$(var.ProductVersion)"
+    UpgradeCode="3A479B39-A96B-48D4-BAFF-C96207D63603"
+    Scope="perUser">
+
+    <SummaryInformation Description="Instalador do SCANOVA — digitalização e conversão documental" />
+
+    <!-- Instalação silenciosa de atualização: uma versão mais nova sempre substitui a anterior
+         (a licença ativada continua válida — fica em %LOCALAPPDATA%\SCANOVA, fora da pasta de
+         instalação, nunca tocada pelo instalador). -->
+    <MajorUpgrade DowngradeErrorMessage="Uma versão mais nova do SCANOVA já está instalada. Desinstale-a antes de continuar." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Instalação por usuário (Scope="perUser" acima), sem exigir privilégios de administrador
+         — mesmo princípio de app.manifest (asInvoker) do próprio SCANOVA.App (seção 91). -->
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="INSTALLFOLDER" Name="SCANOVA" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="SCANOVA">
+        <Component Id="ApplicationShortcut" Guid="E1B3E7C1-9E9B-4F2E-9A0B-6B0A6B3F9C11">
+          <Shortcut
+            Id="ApplicationStartMenuShortcut"
+            Name="SCANOVA"
+            Description="Digitalização e conversão documental"
+            Target="[INSTALLFOLDER]SCANOVA.exe"
+            WorkingDirectory="INSTALLFOLDER" />
+          <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+          <RegistryValue Root="HKCU" Key="Software\SCANOVA" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <!-- AppFilesComponentGroup vem da colheita automática da pasta publicada de SCANOVA.App em
+         tempo de build (HarvestDirectory, ver SCANOVA.Installer.wixproj) — nunca listada à mão
+         aqui, para nunca ficar desatualizada conforme o conteúdo publicado muda entre versões. -->
+    <Feature Id="MainFeature" Title="SCANOVA" Level="1">
+      <ComponentGroupRef Id="AppFilesComponentGroup" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+  </Package>
+</Wix>

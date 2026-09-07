@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <!-- Necessário em Linux: SCANOVA.Imaging referencia o SkiaSharp "puro" (sem biblioteca
+         nativa embutida) — sem este pacote, SKTypeface.FromFile/SKBitmap etc. falham com
+         DllNotFoundException ao rodar os testes fora do Windows. Mesmo padrão já usado em
+         SCANOVA.Imaging.Tests e SCANOVA.Tiff.Tests. -->
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SCANOVA.Ocr\SCANOVA.Ocr.csproj" />
+    <ProjectReference Include="..\..\src\SCANOVA.Core\SCANOVA.Core.csproj" />
+    <!-- Só o projeto de testes referencia SCANOVA.Imaging — usa o SkiaImageExporter real (não um
+         mock) e o SkiaSharp diretamente para desenhar texto de teste em uma imagem sintética,
+         gerando um fixture de "documento escaneado" de verdade para o Tesseract reconhecer. -->
+    <ProjectReference Include="..\..\src\SCANOVA.Imaging\SCANOVA.Imaging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Mesmo arquivo de fonte usado por SCANOVA.Pdf para a camada de texto pesquisável —
+         reaproveitado aqui (via SkiaSharp, carregada diretamente do arquivo) para desenhar texto
+         de teste sem depender de nenhuma fonte instalada no sistema do executor dos testes. -->
+    <None Include="..\..\src\SCANOVA.Pdf\Assets\NotoSans.ttf" Link="TestAssets\NotoSans.ttf" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SCANOVA.Core\SCANOVA.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Geração de PDF (páginas de imagem, dimensionadas a partir do DPI, mais a camada de
+         texto invisível pesquisável da Fase 9 — ver EmbeddedFontResolver). -->
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
+    <!-- Rasterização de páginas PDF existentes (via PDFium). Já traz o SkiaSharp consigo
+         (retorna SKBitmap), então reaproveitamos essa mesma dependência para codificar as
+         páginas de imagem embutidas no PDF, em vez de referenciar SCANOVA.Imaging. -->
+    <PackageReference Include="PDFtoImage" Version="5.4.0" />
+    <!-- Extração de texto NATIVO de um PDF que já contém texto real (sem OCR — seção 109). -->
+    <PackageReference Include="PdfPig" Version="0.1.16" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Fonte embutida usada só para desenhar a camada de texto invisível/pesquisável do OCR
+         (Fase 9) — o build "CORE" (sem GDI+/WPF) do PDFsharp não tem acesso a fontes do sistema
+         em Linux/macOS, então precisa de um IFontResolver com os bytes da fonte já em mãos (ver
+         EmbeddedFontResolver e docs/PDF.md). Noto Sans (SIL Open Font License 1.1 — ver
+         Assets/NotoSans-OFL.txt) foi escolhida pela cobertura Unicode ampla (inclui todos os
+         acentos do português) e por ser um projeto de fonte muito conhecido/estável do Google. -->
+    <EmbeddedResource Include="Assets\NotoSans.ttf" />
+  </ItemGroup>
+
+</Project>
