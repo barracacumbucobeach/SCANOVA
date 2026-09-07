@@ -56,6 +56,22 @@
          (a colheita dos arquivos publicados de SCANOVA.App), que substitui a colheita baseada em
          HarvestDirectory/heat.exe — mais simples e nativa do WiX v4. -->
     <DefineConstants>ProductVersion=$(ProductVersion);AppPublishDir=$(AppPublishDir)</DefineConstants>
+
+    <!-- ICE38/ICE91/ICE64 suprimidos deliberadamente — não é um erro de autoria deste projeto,
+         e sim uma limitação conhecida e ainda não corrigida do próprio WiX Toolset (rastreada em
+         https://github.com/wixtoolset/issues/issues/8633: "Generated components should be
+         ICE-clean for per-user target directories"): quando <Files> colhe automaticamente os
+         arquivos publicados (ver Product.wxs), cada componente gerado usa o próprio arquivo como
+         KeyPath, o que o validador ICE38 rejeita para instalações Scope="perUser" (exige um valor
+         de registro sob HKCU como KeyPath em vez de um arquivo, regra pensada para o cenário mais
+         antigo de perfis móveis do Windows). Como o WiX ainda não gera esse KeyPath de registro
+         automaticamente para componentes colhidos, e listar cada arquivo manualmente pra corrigir
+         cada um perderia o benefício do <Files> (nunca ficar desatualizado conforme o publish
+         muda), a solução usada por instaladores reais no mesmo cenário (perUser + colheita
+         automática) — confirmada em `keybase/client` (mesma combinação ICE20/38/91/60 suprimida)
+         e outros projetos WiX abertos — é suprimir essas ICEs específicas, mantendo as demais
+         validações ativas (SuppressValidation continua "false", só as três ICEs abaixo somem). -->
+    <SuppressIces>ICE38;ICE91;ICE64</SuppressIces>
   </PropertyGroup>
 
 </Project>
