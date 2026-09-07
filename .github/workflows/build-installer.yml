@@ -25,7 +25,18 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Publicar SCANOVA.App (win-x64, autocontido)
-        run: dotnet publish src/SCANOVA.App -c Release -p:PublishProfile=win-x64
+        # -p:Platform=x64 precisa ir explícito na linha de comando, mesmo o win-x64.pubxml já
+        # declarando <Platform>x64</Platform> — bug conhecido do WinUI 3/Windows App SDK
+        # (github.com/microsoft/WindowsAppSDK discussions #3026): sem isso na linha de comando,
+        # o Platform da avaliação inicial do projeto cai para "AnyCPU" antes do pubxml ser
+        # importado, e os targets que geram resources.pri e os .xbf (páginas XAML compiladas)
+        # são pulados silenciosamente — o publish "funciona" (todos os outros DLLs/runtime vão
+        # normalmente), só falta exatamente o que o WinUI 3 precisa pra abrir qualquer janela.
+        # Descoberto ao instalar e testar o instalador de verdade numa máquina Windows: o app
+        # abria (processo no Gerenciador de Tarefas) mas nenhuma janela aparecia — XamlParseException
+        # em MainWindow.InitializeComponent(), porque não havia resources.pri nem .xbf na pasta
+        # publicada (confirmado por Get-ChildItem -Recurse no diretório instalado).
+        run: dotnet publish src/SCANOVA.App -c Release -p:PublishProfile=win-x64 -p:Platform=x64
 
       - name: Compilar o instalador (WiX)
         shell: pwsh

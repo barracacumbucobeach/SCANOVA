@@ -25,7 +25,12 @@ $installerProject = Join-Path $repoRoot "installer\SCANOVA.Installer\SCANOVA.Ins
 $publishDir = Join-Path $appProject "bin\publish\win-x64"
 
 Write-Host "==> Publicando SCANOVA.App (win-x64, autocontido)..." -ForegroundColor Cyan
-dotnet publish $appProject -c Release -p:PublishProfile=win-x64
+# -p:Platform=x64 explícito na linha de comando é necessário mesmo com <Platform>x64</Platform>
+# já dentro do win-x64.pubxml -- bug conhecido do WinUI 3/Windows App SDK: sem isso, o Platform
+# da avaliação inicial do projeto cai para "AnyCPU" antes do pubxml ser importado, e os targets
+# que geram resources.pri e os .xbf (páginas XAML compiladas) são pulados silenciosamente --
+# publish "funciona" mas o app abre sem nenhuma janela (XamlParseException em runtime).
+dotnet publish $appProject -c Release -p:PublishProfile=win-x64 -p:Platform=x64
 if ($LASTEXITCODE -ne 0) { throw "Falha ao publicar SCANOVA.App." }
 
 Write-Host "==> Compilando o instalador (WiX)..." -ForegroundColor Cyan

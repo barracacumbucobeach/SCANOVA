@@ -32,7 +32,10 @@
     Actions (ver .github/workflows/build-installer.yml) — nunca compilado neste ambiente Linux.
 
     Pré-requisito: publicar SCANOVA.App antes de compilar este projeto —
-    dotnet publish ..\..\src\SCANOVA.App -c Release -p:PublishProfile=win-x64
+    dotnet publish ..\..\src\SCANOVA.App -c Release -p:PublishProfile=win-x64 -p:Platform=x64
+    (o -p:Platform=x64 na linha de comando é necessário mesmo o pubxml já declarando Platform —
+    ver o comentário equivalente em Build-Installer.ps1/build-installer.yml; sem ele, resources.pri
+    e os .xbf saem faltando do publish e o app abre sem nenhuma janela em runtime).
     (ver installer/Build-Installer.ps1, que faz os dois passos em sequência).
   -->
 
