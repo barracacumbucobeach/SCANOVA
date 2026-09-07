@@ -34,29 +34,56 @@ jobs:
         # publish mesmo assim).
         run: dotnet publish src/SCANOVA.App -c Release -p:PublishProfile=win-x64 -p:Platform=x64
 
-      - name: Copiar resources.pri e .xbf para a pasta publicada
+      - name: DIAGNÓSTICO — mapear tudo que o publish gerou (.pri/.xbf em todo o repo)
+        # Três tentativas seguidas (Platform=x64, cópia manual, .resw mínimo) não resolveram --
+        # cada uma partia de uma hipótese sobre ONDE/COMO o resources.pri deveria aparecer, mas
+        # nenhuma foi confirmada contra a realidade do build. Este passo não corrige nada: só
+        # lista, em todo o workspace (não só src/SCANOVA.App/bin), qualquer *.pri e *.xbf, e a
+        # árvore completa da pasta de publish -- inclusive testando a hipótese de o arquivo se
+        # chamar diferente de "resources.pri" (ex.: SCANOVA.pri, nomeado pelo AssemblyName, comum
+        # em apps "Unpackaged" sem identidade de pacote). Sempre roda (continue-on-error via `;
+        # exit 0` no fim), pra aparecer no log mesmo se o passo seguinte falhar de novo.
+        shell: pwsh
+        run: |
+          Write-Host "===== Todo *.pri no workspace ====="
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Filter "*.pri" -Recurse -ErrorAction SilentlyContinue |
+              Select-Object FullName, Length, LastWriteTime | Format-Table -AutoSize | Out-String -Width 300 | Write-Host
+
+          Write-Host "===== Todo *.xbf no workspace (primeiros 30) ====="
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Filter "*.xbf" -Recurse -ErrorAction SilentlyContinue |
+              Select-Object -First 30 FullName | Format-Table -AutoSize | Out-String -Width 300 | Write-Host
+
+          Write-Host "===== Árvore completa de bin\publish\win-x64 ====="
+          $publishDir = Join-Path $env:GITHUB_WORKSPACE "src\SCANOVA.App\bin\publish\win-x64"
+          Get-ChildItem -Path $publishDir -Recurse -ErrorAction SilentlyContinue |
+              Select-Object FullName, Length | Format-Table -AutoSize | Out-String -Width 300 | Write-Host
+
+          Write-Host "===== Árvore completa de bin\x64\Release (fora de publish) ====="
+          $releaseDir = Join-Path $env:GITHUB_WORKSPACE "src\SCANOVA.App\bin\x64\Release"
+          Get-ChildItem -Path $releaseDir -Recurse -ErrorAction SilentlyContinue |
+              Select-Object FullName, Length | Format-Table -AutoSize | Out-String -Width 300 | Write-Host
+
+      - name: Copiar resources*.pri e .xbf para a pasta publicada
         # Bug conhecido e ainda sem correção definitiva do próprio Windows App SDK, para apps
-        # WinUI 3 "Unpackaged": `dotnet publish` gera resources.pri e as páginas .xbf
-        # normalmente na pasta de BUILD (bin\x64\Release\...), mas não os copia para a pasta de
-        # PUBLISH — mesmo com -p:Platform=x64 corrigido acima. Confirmado contra um build real:
-        # Test-Path "...\resources.pri" retornava False na instalação, e SCANOVA.App abria sem
-        # nenhuma janela (XamlParseException em MainWindow.InitializeComponent(), porque o WinUI 3
-        # não consegue carregar XAML compilado sem esses dois). Workaround oficial confirmado em
-        # github.com/microsoft/WindowsAppSDK issues #3451/#4603 ("copy the .pri file from the
-        # release folder to publish") — nunca corrigido automaticamente pela ferramenta, então
-        # replicamos aqui. Busca dinamicamente (Get-ChildItem -Recurse) em vez de fixar o caminho
-        # exato de bin\, pra não quebrar se a estrutura de pastas do SDK mudar de novo.
+        # WinUI 3 "Unpackaged": `dotnet publish` gera o .pri e as páginas .xbf normalmente na
+        # pasta de BUILD (bin\x64\Release\...), mas não os copia para a pasta de PUBLISH —
+        # confirmado contra builds reais: SCANOVA.exe abria sem nenhuma janela em runtime
+        # (XamlParseException em MainWindow.InitializeComponent()). Busca por "*.pri" (não mais
+        # só o nome exato "resources.pri" -- apps Unpackaged sem identidade de pacote podem gerar
+        # um nome baseado no AssemblyName, ex. SCANOVA.pri) e copia com o MESMO NOME de arquivo
+        # que o WinUI 3 espera encontrar (resources.pri), já que é esse o nome que
+        # Application.LoadComponent busca via ms-appx:// independente de como foi gerado.
         shell: pwsh
         run: |
           $appBin = Join-Path $env:GITHUB_WORKSPACE "src\SCANOVA.App\bin"
           $publishDir = Join-Path $env:GITHUB_WORKSPACE "src\SCANOVA.App\bin\publish\win-x64"
 
-          $sourcePri = Get-ChildItem -Path $appBin -Filter "resources.pri" -Recurse |
+          $sourcePri = Get-ChildItem -Path $appBin -Filter "*.pri" -Recurse |
               Where-Object { $_.FullName -notlike "*\publish\*" } |
               Sort-Object LastWriteTime -Descending | Select-Object -First 1
-          if (-not $sourcePri) { throw "resources.pri não foi encontrado na pasta de build (fora de publish\) -- não há o que copiar." }
-          Copy-Item $sourcePri.FullName $publishDir -Force
-          Write-Host "Copiado: $($sourcePri.FullName) -> $publishDir"
+          if (-not $sourcePri) { throw "Nenhum *.pri foi encontrado na pasta de build (fora de publish\) -- ver o passo de diagnóstico acima." }
+          Copy-Item $sourcePri.FullName (Join-Path $publishDir "resources.pri") -Force
+          Write-Host "Copiado: $($sourcePri.FullName) -> $publishDir\resources.pri"
 
           $sourceRoot = $sourcePri.DirectoryName
           $xbfFiles = Get-ChildItem -Path $sourceRoot -Filter "*.xbf" -Recurse

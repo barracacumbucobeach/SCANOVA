@@ -41,12 +41,12 @@ Write-Host "==> Copiando resources.pri e .xbf para a pasta publicada..." -Foregr
 # file from the release folder to publish"). Busca dinamicamente em vez de fixar o caminho
 # exato de bin\, pra não quebrar se a estrutura de pastas do SDK mudar de novo.
 $appBin = Join-Path $appProject "bin"
-$sourcePri = Get-ChildItem -Path $appBin -Filter "resources.pri" -Recurse |
+$sourcePri = Get-ChildItem -Path $appBin -Filter "*.pri" -Recurse |
     Where-Object { $_.FullName -notlike "*\publish\*" } |
     Sort-Object LastWriteTime -Descending | Select-Object -First 1
-if (-not $sourcePri) { throw "resources.pri não foi encontrado na pasta de build (fora de publish\) -- não há o que copiar." }
-Copy-Item $sourcePri.FullName $publishDir -Force
-Write-Host "Copiado: $($sourcePri.FullName) -> $publishDir"
+if (-not $sourcePri) { throw "Nenhum *.pri foi encontrado na pasta de build (fora de publish\) -- não há o que copiar." }
+Copy-Item $sourcePri.FullName (Join-Path $publishDir "resources.pri") -Force
+Write-Host "Copiado: $($sourcePri.FullName) -> $publishDir\resources.pri"
 
 $sourceRoot = $sourcePri.DirectoryName
 $xbfFiles = Get-ChildItem -Path $sourceRoot -Filter "*.xbf" -Recurse
