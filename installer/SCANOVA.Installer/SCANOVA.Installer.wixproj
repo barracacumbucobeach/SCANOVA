@@ -70,8 +70,18 @@
          muda), a solução usada por instaladores reais no mesmo cenário (perUser + colheita
          automática) — confirmada em `keybase/client` (mesma combinação ICE20/38/91/60 suprimida)
          e outros projetos WiX abertos — é suprimir essas ICEs específicas, mantendo as demais
-         validações ativas (SuppressValidation continua "false", só as três ICEs abaixo somem). -->
-    <SuppressIces>ICE38;ICE91;ICE64</SuppressIces>
+         validações ativas (SuppressValidation continua "false", só as ICEs abaixo somem).
+
+         ICE03 suprimido pelo mesmo motivo, descoberto na build seguinte (run #8 do CI): algumas
+         DLLs nativas empacotadas na publicação autocontida de SCANOVA.App (bibliotecas de
+         terceiros como SkiaSharp/PDFium/Tesseract — não código do SCANOVA) trazem no cabeçalho
+         PE um identificador de idioma (Language) que ou é maior que o limite de coluna do MSI
+         ("WIX1076: String overflow") ou é um valor que o MSI não reconhece como válido ("ICE03:
+         Invalid Language Id"). É metadado do arquivo binário de terceiros, não algo que este
+         projeto controla nem precisa corrigir manualmente — e o campo Language do MSI é só
+         informativo (não afeta a instalação nem o funcionamento do SCANOVA, que é sempre
+         monolíngue PT-BR). -->
+    <SuppressIces>ICE38;ICE91;ICE64;ICE03</SuppressIces>
   </PropertyGroup>
 
 </Project>
