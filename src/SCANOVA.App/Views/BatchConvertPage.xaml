@@ -18,33 +18,51 @@
                     TextWrapping="Wrap" />
             </StackPanel>
 
-            <StackPanel Spacing="8" IsEnabled="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
-                <TextBlock Text="Arquivos" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                <TextBlock Text="{x:Bind ViewModel.FileCount, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <ListView ItemsSource="{x:Bind ViewModel.SourceFileNames}" Height="140" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" />
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Content="Adicionar arquivos" Command="{x:Bind ViewModel.AddFilesCommand}" />
-                    <Button Content="Limpar" Command="{x:Bind ViewModel.ClearFilesCommand}" />
+            <!--
+                IsEnabled só existe em Control (StackPanel/Panel não têm essa propriedade — o
+                compilador XAML acusa WMC0011 se tentar) — por isso cada grupo fica dentro de um
+                ContentControl (que é um Control) para desabilitar tudo dentro dele de uma vez
+                durante a conversão, em vez de desabilitar cada botão/campo individualmente.
+            -->
+            <ContentControl
+                IsEnabled="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Arquivos" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.FileCount, Mode=OneWay}" Style="{ThemeResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <ListView ItemsSource="{x:Bind ViewModel.SourceFileNames}" Height="140" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Adicionar arquivos" Command="{x:Bind ViewModel.AddFilesCommand}" />
+                        <Button Content="Limpar" Command="{x:Bind ViewModel.ClearFilesCommand}" />
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
+            </ContentControl>
 
-            <StackPanel Spacing="8" IsEnabled="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
-                <TextBlock Text="Pasta de destino" Style="{ThemeResource BodyStrongTextBlockStyle}" />
-                <TextBlock Text="{x:Bind ViewModel.DestinationFolder, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap" />
-                <Button Content="Escolher pasta" Command="{x:Bind ViewModel.PickDestinationFolderCommand}" />
-            </StackPanel>
+            <ContentControl
+                IsEnabled="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Pasta de destino" Style="{ThemeResource BodyStrongTextBlockStyle}" />
+                    <TextBlock Text="{x:Bind ViewModel.DestinationFolder, Mode=OneWay}" Style="{ThemeResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                    <Button Content="Escolher pasta" Command="{x:Bind ViewModel.PickDestinationFolderCommand}" />
+                </StackPanel>
+            </ContentControl>
 
-            <StackPanel Spacing="8" IsEnabled="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}">
-                <ComboBox
-                    Header="Formato de saída"
-                    ItemsSource="{x:Bind ViewModel.Formats}"
-                    SelectedItem="{x:Bind ViewModel.SelectedFormat, Mode=TwoWay}"
-                    DisplayMemberPath="Label"
-                    HorizontalAlignment="Stretch" />
+            <ContentControl
+                IsEnabled="{x:Bind ViewModel.IsRunning, Mode=OneWay, Converter={StaticResource InverseBooleanConverter}}"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False">
+                <StackPanel Spacing="8">
+                    <ComboBox
+                        Header="Formato de saída"
+                        ItemsSource="{x:Bind ViewModel.Formats}"
+                        SelectedItem="{x:Bind ViewModel.SelectedFormat, Mode=TwoWay}"
+                        DisplayMemberPath="Label"
+                        HorizontalAlignment="Stretch" />
 
-                <ToggleSwitch Header="Melhorar automaticamente" IsOn="{x:Bind ViewModel.EnhanceAutomatically, Mode=TwoWay}" OnContent="Sim" OffContent="Não" />
-                <ToggleSwitch Header="Sobrescrever arquivos existentes" IsOn="{x:Bind ViewModel.OverwriteExisting, Mode=TwoWay}" OnContent="Sim" OffContent="Não" />
-            </StackPanel>
+                    <ToggleSwitch Header="Melhorar automaticamente" IsOn="{x:Bind ViewModel.EnhanceAutomatically, Mode=TwoWay}" OnContent="Sim" OffContent="Não" />
+                    <ToggleSwitch Header="Sobrescrever arquivos existentes" IsOn="{x:Bind ViewModel.OverwriteExisting, Mode=TwoWay}" OnContent="Sim" OffContent="Não" />
+                </StackPanel>
+            </ContentControl>
 
             <Button
                 Content="Iniciar conversão"
