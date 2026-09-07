@@ -21,6 +21,13 @@
       <Directory Id="INSTALLFOLDER" Name="SCANOVA" />
     </StandardDirectory>
 
+    <!-- Colhe todos os arquivos publicados de SCANOVA.App (AppPublishDir, repassado como
+         variável de pré-processador pelo .wixproj) automaticamente — nunca listados à mão, para
+         nunca ficar desatualizado conforme o conteúdo publicado mudar entre versões. -->
+    <ComponentGroup Id="AppFilesComponentGroup" Directory="INSTALLFOLDER">
+      <Files Include="$(var.AppPublishDir)**" />
+    </ComponentGroup>
+
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ApplicationProgramsFolder" Name="SCANOVA">
         <Component Id="ApplicationShortcut" Guid="E1B3E7C1-9E9B-4F2E-9A0B-6B0A6B3F9C11">
@@ -36,9 +43,6 @@
       </Directory>
     </StandardDirectory>
 
-    <!-- AppFilesComponentGroup vem da colheita automática da pasta publicada de SCANOVA.App em
-         tempo de build (HarvestDirectory, ver SCANOVA.Installer.wixproj) — nunca listada à mão
-         aqui, para nunca ficar desatualizada conforme o conteúdo publicado muda entre versões. -->
     <Feature Id="MainFeature" Title="SCANOVA" Level="1">
       <ComponentGroupRef Id="AppFilesComponentGroup" />
       <ComponentRef Id="ApplicationShortcut" />

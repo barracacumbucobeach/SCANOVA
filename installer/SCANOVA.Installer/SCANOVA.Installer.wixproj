@@ -33,17 +33,13 @@
          (seção 118). Formato exigido pelo MSI: major.minor.build (sem o 4º componente). -->
     <ProductVersion Condition="'$(ProductVersion)' == ''">1.0.0</ProductVersion>
 
-    <!-- $(var.ProductVersion) usado em Product.wxs só existe se a propriedade MSBuild acima for
+    <!-- $(var.X) usado em Product.wxs só existe se a propriedade MSBuild correspondente for
          explicitamente repassada como variável de pré-processador do WiX (as duas coisas são
-         namespaces diferentes — uma propriedade MSBuild sozinha não vira "var.X" automaticamente). -->
-    <DefineConstants>ProductVersion=$(ProductVersion)</DefineConstants>
+         namespaces diferentes — uma propriedade MSBuild sozinha não vira "var.X" automaticamente).
+         AppPublishDir alimenta o glob <Files Include="$(var.AppPublishDir)**" /> em Product.wxs
+         (a colheita dos arquivos publicados de SCANOVA.App), que substitui a colheita baseada em
+         HarvestDirectory/heat.exe — mais simples e nativa do WiX v4. -->
+    <DefineConstants>ProductVersion=$(ProductVersion);AppPublishDir=$(AppPublishDir)</DefineConstants>
   </PropertyGroup>
-
-  <ItemGroup>
-    <HarvestDirectory Include="$(AppPublishDir)">
-      <ComponentGroupName>AppFilesComponentGroup</ComponentGroupName>
-      <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
-    </HarvestDirectory>
-  </ItemGroup>
 
 </Project>
