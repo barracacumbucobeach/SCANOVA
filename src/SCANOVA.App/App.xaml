@@ -11,10 +11,6 @@
                 <ResourceDictionary Source="Styles/Cards.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-            <converters:BoolToInfoBarSeverityConverter x:Key="BoolToInfoBarSeverityConverter" />
-
             <!--
                 Cores de marca do SCANOVA (seção 8: cor principal + tons neutros + estados
                 semânticos) — seguem o tema ativo (Fase 11, modo escuro): os tons de cada cor no
@@ -23,6 +19,10 @@
                 perde legibilidade em cima de um fundo quase preto). Chaves iguais nas duas
                 seções — todo o resto do aplicativo referencia só {ThemeResource ScanovaXBrush},
                 nunca a cor diretamente, então nenhuma página precisa saber que isso existe.
+
+                Importante: MergedDictionaries/ThemeDictionaries precisam ficar juntas, ANTES de
+                qualquer recurso "solto" (sem isso o compilador XAML acusa WMC0035 — duas
+                atribuições à propriedade de conteúdo implícita do ResourceDictionary).
             -->
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Default">
@@ -38,6 +38,10 @@
                     <Color x:Key="ScanovaErrorColor">#FF6B5D</Color>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <converters:BoolToInfoBarSeverityConverter x:Key="BoolToInfoBarSeverityConverter" />
 
             <SolidColorBrush x:Key="ScanovaBrandBrush" Color="{ThemeResource ScanovaBrandColor}" />
             <SolidColorBrush x:Key="ScanovaSuccessBrush" Color="{ThemeResource ScanovaSuccessColor}" />
