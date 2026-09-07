@@ -26,17 +26,48 @@ jobs:
 
       - name: Publicar SCANOVA.App (win-x64, autocontido)
         # -p:Platform=x64 precisa ir explícito na linha de comando, mesmo o win-x64.pubxml já
-        # declarando <Platform>x64</Platform> — bug conhecido do WinUI 3/Windows App SDK
-        # (github.com/microsoft/WindowsAppSDK discussions #3026): sem isso na linha de comando,
-        # o Platform da avaliação inicial do projeto cai para "AnyCPU" antes do pubxml ser
-        # importado, e os targets que geram resources.pri e os .xbf (páginas XAML compiladas)
-        # são pulados silenciosamente — o publish "funciona" (todos os outros DLLs/runtime vão
-        # normalmente), só falta exatamente o que o WinUI 3 precisa pra abrir qualquer janela.
-        # Descoberto ao instalar e testar o instalador de verdade numa máquina Windows: o app
-        # abria (processo no Gerenciador de Tarefas) mas nenhuma janela aparecia — XamlParseException
-        # em MainWindow.InitializeComponent(), porque não havia resources.pri nem .xbf na pasta
-        # publicada (confirmado por Get-ChildItem -Recurse no diretório instalado).
+        # declarando <Platform>x64</Platform> (github.com/microsoft/WindowsAppSDK discussions
+        # #3026) — sem isso, o Platform da avaliação inicial do projeto cai para "AnyCPU" antes
+        # do pubxml ser importado. Corrige a avaliação (confirmado: o caminho intermediário passa
+        # a ter "obj\x64\Release\..." em vez de "obj\Release\..."), mas sozinho NÃO basta — ver o
+        # passo seguinte para o resto do problema (resources.pri/.xbf ainda ficavam de fora do
+        # publish mesmo assim).
         run: dotnet publish src/SCANOVA.App -c Release -p:PublishProfile=win-x64 -p:Platform=x64
+
+      - name: Copiar resources.pri e .xbf para a pasta publicada
+        # Bug conhecido e ainda sem correção definitiva do próprio Windows App SDK, para apps
+        # WinUI 3 "Unpackaged": `dotnet publish` gera resources.pri e as páginas .xbf
+        # normalmente na pasta de BUILD (bin\x64\Release\...), mas não os copia para a pasta de
+        # PUBLISH — mesmo com -p:Platform=x64 corrigido acima. Confirmado contra um build real:
+        # Test-Path "...\resources.pri" retornava False na instalação, e SCANOVA.App abria sem
+        # nenhuma janela (XamlParseException em MainWindow.InitializeComponent(), porque o WinUI 3
+        # não consegue carregar XAML compilado sem esses dois). Workaround oficial confirmado em
+        # github.com/microsoft/WindowsAppSDK issues #3451/#4603 ("copy the .pri file from the
+        # release folder to publish") — nunca corrigido automaticamente pela ferramenta, então
+        # replicamos aqui. Busca dinamicamente (Get-ChildItem -Recurse) em vez de fixar o caminho
+        # exato de bin\, pra não quebrar se a estrutura de pastas do SDK mudar de novo.
+        shell: pwsh
+        run: |
+          $appBin = Join-Path $env:GITHUB_WORKSPACE "src\SCANOVA.App\bin"
+          $publishDir = Join-Path $env:GITHUB_WORKSPACE "src\SCANOVA.App\bin\publish\win-x64"
+
+          $sourcePri = Get-ChildItem -Path $appBin -Filter "resources.pri" -Recurse |
+              Where-Object { $_.FullName -notlike "*\publish\*" } |
+              Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $sourcePri) { throw "resources.pri não foi encontrado na pasta de build (fora de publish\) -- não há o que copiar." }
+          Copy-Item $sourcePri.FullName $publishDir -Force
+          Write-Host "Copiado: $($sourcePri.FullName) -> $publishDir"
+
+          $sourceRoot = $sourcePri.DirectoryName
+          $xbfFiles = Get-ChildItem -Path $sourceRoot -Filter "*.xbf" -Recurse
+          foreach ($xbf in $xbfFiles) {
+              $relative = $xbf.FullName.Substring($sourceRoot.Length).TrimStart('\')
+              $dest = Join-Path $publishDir $relative
+              $destDir = Split-Path $dest -Parent
+              if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Force -Path $destDir | Out-Null }
+              Copy-Item $xbf.FullName $dest -Force
+          }
+          Write-Host "Copiados $($xbfFiles.Count) arquivo(s) .xbf de $sourceRoot -> $publishDir"
 
       - name: Compilar o instalador (WiX)
         shell: pwsh
