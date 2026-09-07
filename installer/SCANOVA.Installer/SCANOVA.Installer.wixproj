@@ -1,4 +1,4 @@
-<Project Sdk="WixToolset.Sdk/4.0.6">
+<Project Sdk="WixToolset.Sdk/5.0.2">
 
   <!--
     Instalador tradicional (MSI, seção 91/118) — NÃO é MSIX: assim o SCANOVA pode ser distribuído
@@ -7,13 +7,29 @@
     Product.wxs) — sem exigir privilégios de administrador, mesmo princípio de
     app.manifest (asInvoker) já usado pelo próprio SCANOVA.App.
 
+    Versão do SDK fixada em 5.0.2 — nem 4.x, nem 6.x/7.x — por dois motivos:
+    1. O elemento <Files> usado em Product.wxs para colher os arquivos publicados só existe a
+       partir do WiX v5 (confirmado contra builds reais no GitHub Actions: a versão 4.0.6
+       rejeitava <Files> como "unexpected child element" tanto dentro de ComponentGroup quanto
+       de Directory — não era erro de sintaxe, a versão do SDK é que era anterior ao recurso).
+    2. A partir da v6.0.0, o pacote NuGet `wix`/`WixToolset.Sdk` passou a exigir aceitar um EULA
+       adicional (OSMFEULA — "Open Source Maintenance Fee") sobre o **binário pré-compilado**:
+       uma taxa mensal para usuários com faturamento anual ≥ US$10.000 usando esse binário —
+       incompatível com "nunca cobrança recorrente" (o mesmo princípio por trás do modelo de
+       licença vitalícia do próprio SCANOVA, seção 146). A v5.0.2 (a última da série 5.x) ainda
+       está sob MS-RL puro, sem esse EULA (verificado: `license type="expression" MS-RL` no
+       nuspec, contra `license type="file" OSMFEULA.txt` a partir da v6.0.0) — mesma limitação
+       da licença já não se aplica porque o WiX é ferramenta de build, nunca distribuída com o
+       aplicativo, mas a taxa recai sobre quem USA o binário para compilar, então importa aqui.
+
+    O namespace do XML em Product.wxs continua "http://wixtoolset.org/schemas/v4/wxs"
+    propositalmente — é o nome do esquema da linguagem WXS (estável desde a v4), não da versão
+    do pacote/ferramenta.
+
     IMPORTANTE — limitação conhecida deste ambiente: o WiX Toolset só roda no Windows (confirmado
     ao tentar `wix build` neste ambiente Linux: falha com "The WiX Toolset only supports
-    Windows"). Este projeto foi escrito com cuidado a partir da documentação oficial do WiX v4,
-    mas NUNCA foi de fato compilado nem testado neste ambiente — precisa de uma primeira
-    verificação em uma máquina Windows antes de confiar nele para gerar um instalador real (ver
-    docs/BUILD.md e docs/LICENSING.md... digo, docs/ARCHITECTURE.md). Mesmo espírito da limitação
-    já documentada para SCANOVA.App (compilador XAML nativo do Windows).
+    Windows"). Este projeto foi escrito e ajustado iterativamente contra builds reais no GitHub
+    Actions (ver .github/workflows/build-installer.yml) — nunca compilado neste ambiente Linux.
 
     Pré-requisito: publicar SCANOVA.App antes de compilar este projeto —
     dotnet publish ..\..\src\SCANOVA.App -c Release -p:PublishProfile=win-x64

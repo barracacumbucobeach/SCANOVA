@@ -16,20 +16,21 @@
     <MediaTemplate EmbedCab="yes" />
 
     <!-- Instalação por usuário (Scope="perUser" acima), sem exigir privilégios de administrador
-         — mesmo princípio de app.manifest (asInvoker) do próprio SCANOVA.App (seção 91).
-
-         <Files> colhe automaticamente todos os arquivos publicados de SCANOVA.App
-         (AppPublishDir, repassado como variável de pré-processador pelo .wixproj) — nunca
-         listados à mão, para nunca ficar desatualizado conforme o conteúdo publicado mudar
-         entre versões. Precisa ficar dentro de <Directory> (não de <ComponentGroup> — o
-         compilador rejeita isso: "unexpected child element 'Files'"); os componentes que ele
-         gera entram automaticamente na única <Feature> do pacote (WiX v4 associa
-         implicitamente todo componente autorado quando há só uma feature). -->
+         — mesmo princípio de app.manifest (asInvoker) do próprio SCANOVA.App (seção 91). -->
     <StandardDirectory Id="LocalAppDataFolder">
-      <Directory Id="INSTALLFOLDER" Name="SCANOVA">
-        <Files Include="$(var.AppPublishDir)**" />
-      </Directory>
+      <Directory Id="INSTALLFOLDER" Name="SCANOVA" />
     </StandardDirectory>
+
+    <!-- Colhe automaticamente todos os arquivos publicados de SCANOVA.App (AppPublishDir,
+         repassado como variável de pré-processador pelo .wixproj) — nunca listados à mão, para
+         nunca ficar desatualizado conforme o conteúdo publicado mudar entre versões. <Files>
+         precisa do WiX v5+ (ver comentário no .wixproj) e vai dentro de um <ComponentGroup>
+         com o atributo Directory apontando para onde os arquivos devem ser instalados —
+         confirmado contra vários instaladores reais de projetos WinUI/.NET publicados no
+         GitHub. -->
+    <ComponentGroup Id="AppFilesComponentGroup" Directory="INSTALLFOLDER">
+      <Files Include="$(var.AppPublishDir)**" />
+    </ComponentGroup>
 
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ApplicationProgramsFolder" Name="SCANOVA">
@@ -46,9 +47,8 @@
       </Directory>
     </StandardDirectory>
 
-    <!-- Sem ComponentGroupRef para os arquivos colhidos por <Files> acima: com uma única
-         Feature no pacote, WiX v4 já associa todo componente autorado a ela automaticamente. -->
     <Feature Id="MainFeature" Title="SCANOVA" Level="1">
+      <ComponentGroupRef Id="AppFilesComponentGroup" />
       <ComponentRef Id="ApplicationShortcut" />
     </Feature>
 
